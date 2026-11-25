@@ -377,6 +377,27 @@
   .v-frame{width:100%;height:100%;border:0;background:#fff;display:block}
   .v-note{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;background:#2A2830;color:rgba(255,255,255,.85);font-size:13px}
   .v-note a{color:#fff;font-weight:700}
+  /* Portfolio link viewer: a small browser window inside the popup */
+  .mb{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;background:#2A2830;color:#fff}
+  .mb-dots{display:flex;gap:5px}.mb-dots i{width:10px;height:10px;border-radius:50%;background:#FF5F57}.mb-dots i:nth-child(2){background:#FEBC2E}.mb-dots i:nth-child(3){background:#28C840}
+  .mb-url{flex:1;min-width:160px;display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:9px;background:rgba(255,255,255,.1);font-size:13px;color:rgba(255,255,255,.9);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .mb-url img{width:16px;height:16px;border-radius:3px;flex:none}
+  .mb-url span{overflow:hidden;text-overflow:ellipsis}
+  .mb-seg{display:flex;background:rgba(255,255,255,.1);border-radius:9px;padding:3px}
+  .mb-seg button{height:26px;padding:0 10px;border-radius:7px;font-size:12px;font-weight:600;color:rgba(255,255,255,.75)}
+  .mb-seg button.on{background:#fff;color:var(--ink)}
+  .mb a,.mb .mb-btn{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 10px;border-radius:9px;background:rgba(255,255,255,.1);color:#fff;font-size:12px;font-weight:600;text-decoration:none}
+  .mb a:hover,.mb .mb-btn:hover{background:rgba(255,255,255,.2)}
+  .mb a svg,.mb .mb-btn svg{width:14px;height:14px}
+  .mb-hint{width:100%;font-size:12px;color:rgba(255,255,255,.6)}
+  .mb-stage{position:absolute;inset:0;overflow:auto;background:#fff}
+  .mb-stage iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+  .mb-stage .shot{display:block;width:100%;max-width:1280px;margin:0 auto;height:auto}
+  .mb-stage .wait a{text-decoration:none;color:var(--ink)}
+  .mb-seg button[disabled]{opacity:.4;cursor:default}
+  .mb-stage .wait{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:12px;color:var(--muted);font-size:14px;text-align:center;padding:24px}
+  .mb-stage.dark{background:#1b1a1f}
+  @media (max-width:640px){.mb-dots{display:none}.mb-url{order:3;min-width:100%}}
   @media (max-width:640px){.v-zoom,.v-hide-m{display:none}}
 
   /* Gate & toast */
@@ -1646,7 +1667,7 @@ function loadPdfJs(){
 
 function b64ToBytes(b64){ var bin = atob(b64), out = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; }
 
-function vState(html){ $('#vPages').innerHTML = ''; var old = $('#vBody .v-state'); if (old) old.remove(); var n = $('#vNote'); if (n) n.remove(); var f = $('#vBody .v-frame'); if (f) f.remove(); if (html) $('#vBody').insertAdjacentHTML('beforeend', '<div class="v-state">' + html + '</div>'); }
+function vState(html){ $('#vPages').innerHTML = ''; var old = $('#vBody .v-state'); if (old) old.remove(); var n = $('#vNote'); if (n) n.remove(); var f = $('#vBody .v-frame'); if (f) f.remove(); var mb = $('#mbBar'); if (mb) mb.remove(); var st = $('#mbStage'); if (st) st.remove(); clearTimeout(V.shotT); V.link = null; if (html) $('#vBody').insertAdjacentHTML('beforeend', '<div class="v-state">' + html + '</div>'); }
 function showPdfTools(on){ $$('.v-pdf').forEach(function(b){ b.hidden = !on; }); $('#vZoomLbl').textContent = on ? Math.round(V.zoom * 100) + '%' : ''; }
 
 function openViewer(kind){
@@ -1702,14 +1723,84 @@ function drawPages(token){
   })();
 }
 
+/**
+ * Turn a portfolio link into something that can be shown inside the popup.
+ * Many sites (Behance, Instagram, TikTok, Canva, Figma, YouTube…) have an official embed address;
+ * sites that refuse to be framed (Facebook, LinkedIn, profile pages…) are shown as a full-page screenshot.
+ */
+function linkEmbed(raw){
+  var url = String(raw || '').trim(); if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  var u; try { u = new URL(url); } catch (e) { return { url: url, host: url, src: url, mode: 'web', canWeb: true }; }
+  var host = u.hostname.replace(/^www\./, '').replace(/^m\./, ''), path = u.pathname, m;
+  var out = { url: url, host: host, src: url, mode: 'web', canWeb: true, kind: '' };
+  var ext = (path.split('.').pop() || '').toLowerCase();
+  if (/^(jpe?g|png|gif|webp|avif)$/.test(ext)) return Object.assign(out, { kind: 'image', src: url, mode: 'image' });
+  if (/^(pdf|pptx?|docx?|xlsx?)$/.test(ext) && !/google\.com$/.test(host)) return Object.assign(out, { kind: 'Tài liệu', src: 'https://docs.google.com/viewer?embedded=true&url=' + encodeURIComponent(url) });
+  if ((m = url.match(/(?:drive|docs)\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=|(document|presentation|spreadsheets)\/d\/)([\w-]{20,})/)))
+    return Object.assign(out, { kind: 'Google Drive', src: m[1] ? 'https://docs.google.com/' + m[1] + '/d/' + m[2] + '/preview' : 'https://drive.google.com/file/d/' + m[2] + '/preview' });
+  if ((m = url.match(/drive\.google\.com\/drive\/(?:u\/\d+\/)?folders\/([\w-]{10,})/)))
+    return Object.assign(out, { kind: 'Thư mục Drive', src: 'https://drive.google.com/embeddedfolderview?id=' + m[1] + '#grid' });
+  if (/youtube\.com|youtu\.be/.test(host) && (m = url.match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([\w-]{6,})/)))
+    return Object.assign(out, { kind: 'YouTube', src: 'https://www.youtube.com/embed/' + m[1] });
+  if (/vimeo\.com/.test(host) && (m = path.match(/\/(\d{5,})/))) return Object.assign(out, { kind: 'Vimeo', src: 'https://player.vimeo.com/video/' + m[1] });
+  if (/tiktok\.com/.test(host)) {
+    if ((m = path.match(/\/video\/(\d+)/))) return Object.assign(out, { kind: 'TikTok', src: 'https://www.tiktok.com/embed/v2/' + m[1] });
+    return Object.assign(out, { kind: 'TikTok', mode: 'shot', canWeb: false });
+  }
+  if (/instagram\.com/.test(host)) {
+    if ((m = path.match(/\/(p|reel|tv)\/([\w-]+)/))) return Object.assign(out, { kind: 'Instagram', src: 'https://www.instagram.com/' + m[1] + '/' + m[2] + '/embed/captioned/' });
+    return Object.assign(out, { kind: 'Instagram', mode: 'shot', canWeb: false });
+  }
+  if (/behance\.net/.test(host)) {
+    if ((m = path.match(/\/gallery\/(\d+)/))) return Object.assign(out, { kind: 'Behance', src: 'https://www.behance.net/embed/project/' + m[1] + '?ilo0=1' });
+    return Object.assign(out, { kind: 'Behance', mode: 'shot', canWeb: false });
+  }
+  if (/canva\.com/.test(host) && (m = path.match(/\/design\/([\w-]+)/))) return Object.assign(out, { kind: 'Canva', src: 'https://www.canva.com/design/' + m[1] + '/view?embed' });
+  if (/figma\.com/.test(host)) return Object.assign(out, { kind: 'Figma', src: 'https://www.figma.com/embed?embed_host=share&url=' + encodeURIComponent(url) });
+  if (/(^|\.)(facebook\.com|fb\.com|fb\.watch|linkedin\.com|pinterest\.[a-z.]+|dribbble\.com|x\.com|twitter\.com|threads\.net|github\.com|medium\.com)$/.test(host))
+    return Object.assign(out, { mode: 'shot', canWeb: false });
+  return out;
+}
+function shotUrl(url, n){ return 'https://s.wordpress.com/mshots/v1/' + encodeURIComponent(url) + '?w=1280&h=2400' + (n ? '&r=' + n : ''); }
+
 function showLink(url){
-  var m = String(url).match(/(?:drive|docs)\.google\.com\/(?:file\/d\/|open\?id=|(document|presentation|spreadsheets)\/d\/)([\w-]{20,})/);
-  var src = url;
-  if (m) src = m[1] ? 'https://docs.google.com/' + m[1] + '/d/' + m[2] + '/preview' : 'https://drive.google.com/file/d/' + m[2] + '/preview';
-  if (!/^https?:\/\//i.test(src)) src = 'https://' + src;
   vState('');
-  $('#vBody').insertAdjacentHTML('beforeend', '<iframe class="v-frame" src="' + esc(src) + '" referrerpolicy="no-referrer" allowfullscreen></iframe>');
-  $('#viewer .v-top').insertAdjacentHTML('afterend', '<div class="v-note" id="vNote"><span>Link ứng viên gửi: ' + esc(url) + '. Một số website (Behance, Canva…) chặn xem trực tiếp, nếu trang trắng hãy</span><a href="' + esc(/^https?:/i.test(url) ? url : 'https://' + url) + '" target="_blank" rel="noopener">mở trong tab mới ' + ICON.ext + '</a></div>');
+  var L = linkEmbed(url); V.link = L;
+  $('#viewer .v-top').insertAdjacentHTML('afterend',
+    '<div class="mb" id="mbBar"><span class="mb-dots"><i></i><i></i><i></i></span>' +
+      '<span class="mb-url"><img alt="" src="https://www.google.com/s2/favicons?sz=32&domain=' + encodeURIComponent(L.host) + '"><span>' + esc(L.url.replace(/^https?:\/\//, '')) + '</span></span>' +
+      (L.mode !== 'image' ? '<span class="mb-seg"><button data-lmode="web"' + (L.canWeb ? '' : ' disabled title="Trang này không cho xem trực tiếp"') + '>Trang web</button><button data-lmode="shot">Ảnh chụp trang</button></span>' : '') +
+      '<button class="mb-btn" data-lreload title="Tải lại">' + ICON.refresh + '</button>' +
+      '<a href="' + esc(L.url) + '" target="_blank" rel="noopener">Mở tab mới ' + ICON.ext + '</a>' +
+      '<span class="mb-hint" id="mbHint"></span></div>');
+  $('#vBody').insertAdjacentHTML('beforeend', '<div class="mb-stage" id="mbStage"></div>');
+  drawLink();
+}
+function drawLink(){
+  var L = V.link, st = $('#mbStage'); if (!L || !st) return;
+  clearTimeout(V.shotT);
+  $$('[data-lmode]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-lmode') === L.mode); });
+  var hint = $('#mbHint');
+  if (L.mode === 'image') { st.innerHTML = '<img class="shot" alt="" src="' + esc(L.src) + '">'; hint.textContent = ''; return; }
+  if (L.mode === 'web') {
+    st.innerHTML = '<iframe src="' + esc(L.src) + '" referrerpolicy="no-referrer" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+    hint.textContent = (L.kind ? 'Đang xem ' + L.kind + ' ngay trong trang. ' : '') + 'Nếu khung trắng hoặc báo lỗi, bấm "Ảnh chụp trang".';
+    return;
+  }
+  // Screenshot of the whole page (for sites that refuse to be framed). The first request can take a few seconds.
+  hint.textContent = 'Ảnh chụp toàn trang để xem nhanh — bấm vào link không được. Cần bấm vào thì dùng "Mở tab mới".';
+  st.innerHTML = '<div class="wait"><span class="spinner dark"></span><span>Đang chụp trang ' + esc(L.host) + '…</span></div>';
+  var tries = 0, token = V.token;
+  (function attempt(){
+    var img = new Image();
+    img.onload = function(){
+      if (token !== V.token || !V.link || V.link.mode !== 'shot') return;
+      if (img.naturalWidth < 600 && tries < 6) { tries++; V.shotT = setTimeout(attempt, 3000); return; }   // placeholder while the shot is being made
+      st.innerHTML = ''; img.className = 'shot'; st.appendChild(img);
+    };
+    img.onerror = function(){ if (token === V.token) st.innerHTML = '<div class="wait"><span>Không chụp được trang này.</span><a class="btn" style="background:var(--soft)" href="' + esc(L.url) + '" target="_blank" rel="noopener">Mở tab mới</a></div>'; };
+    img.src = shotUrl(L.url, tries);
+  })();
 }
 
 function closeViewer(){
@@ -1751,6 +1842,8 @@ document.addEventListener('click', function(e){
   if (e.target.closest('[data-accounts]')) { openAccounts(); return; }
   if (e.target.closest('[data-accclose]') || e.target.id === 'accWrap') { closeAccounts(); return; }
   if ((el = e.target.closest('[data-accreset]'))) { accReset(el); return; }
+  if ((el = e.target.closest('[data-lmode]'))) { if (!el.disabled && V.link) { V.link.mode = el.getAttribute('data-lmode'); drawLink(); } return; }
+  if (e.target.closest('[data-lreload]')) { drawLink(); return; }
   if ((el = e.target.closest('[data-vnav]'))) { if (!el.disabled) viewerNav(+el.getAttribute('data-vnav')); return; }
   if ((el = e.target.closest('[data-nav]'))) { if (!el.disabled) nav(+el.getAttribute('data-nav')); return; }
   if ((el = e.target.closest('[data-view]'))) { openViewer(el.getAttribute('data-view')); return; }
