@@ -743,10 +743,10 @@ var DEMO_API = {
       '<p style="margin:0 0 6px"><b>Thông tin phỏng vấn như sau:</b></p><ul style="margin:0 0 14px;padding-left:24px"><li>Thời gian: <b>' + when + '</b></li>' +
       (p.mode === 'online' ? '<li>Hình thức: Online qua nền tảng Google Meet</li><li>Link: <a href="' + esc(p.link) + '">' + esc(p.link) + '</a></li>' : '<li>Địa điểm:<br>' + esc(cfg.company) + '<br>' + esc(cfg.address) + '</li>') + '</ul>' +
       '<p style="margin:0"><b>Các nhân sự tham gia phỏng vấn:</b></p><p style="' + P + '">' + p.interviewers.map(function(x, i){ return (i + 1) + '. ' + esc(x); }).join('<br>') + '</p>' +
-      (p.mode === 'offline' ? '<p style="' + P + '">Khi đến, vui lòng liên hệ <b>' + esc(cfg.contact) + '</b> để được hỗ trợ.</p>' : '') +
+      (p.mode === 'offline' ? '<p style="' + P + '">Khi đến, vui lòng liên hệ <b>' + esc(p.contact || cfg.contact) + '</b> để được hỗ trợ.</p>' : '') +
       '<p style="' + P + '">Để buổi phỏng vấn diễn ra thuận lợi, bạn vui lòng xác nhận tham gia bằng cách phản hồi email này. Trong trường hợp cần thay đổi thời gian, bạn có thể chủ động trao đổi để công ty sắp xếp phù hợp.</p>' +
       '<p style="' + P + '">Rất mong được gặp bạn tại buổi phỏng vấn.</p><p style="margin:0">Trân trọng,</p>' + DEMO_SIG + '</div>';
-    return { to: 'ungvien@example.com', from: cfg.from, subject: '[INSIDE BRIDGE VN] Thư Mời Tham Gia Phỏng Vấn', html: html };
+    return { to: 'ungvien@example.com', from: cfg.from, subject: p.subject || '[INSIDE BRIDGE VN] Thư Mời Tham Gia Phỏng Vấn', html: html };
   },
   sendInvite: function(ref, p){
     var m = p.date.split('-'), res = { hrStatus: 'Đã hẹn PV', interview: m[2] + '/' + m[1] + '/' + m[0] + ' ' + p.time, invite: 'vừa xong · ' + (p.mode === 'online' ? 'Online' : 'Offline') + ' · ' + DEMO.me.email, to: 'ungvien@example.com' };
@@ -764,7 +764,7 @@ var DEMO_API = {
       '<p style="' + P + '">Trong thời gian thử việc, căn cứ vào kết quả làm việc và mức độ phù hợp với môi trường công ty, chúng tôi sẽ xem xét ký kết hợp đồng lao động chính thức.</p>' +
       '<p style="' + P + '">Nếu bạn đồng ý với các nội dung trên, vui lòng phản hồi email này để xác nhận.<br>Chúng tôi mong sớm được chào đón bạn gia nhập đội ngũ Inside Bridge Việt Nam.</p>' +
       '<p style="margin:0">Trân trọng.</p>' + DEMO_SIG + '</div>';
-    return { to: 'ungvien@example.com', from: DEMO.invite.from, subject: '[INSIDE BRIDGE VN] Thư mời làm việc - ' + p.position.toUpperCase(), html: html };
+    return { to: 'ungvien@example.com', from: DEMO.invite.from, subject: p.subject || ('[INSIDE BRIDGE VN] Thư mời làm việc - ' + p.position.toUpperCase()), html: html };
   },
   sendOffer: function(ref, p){
     var m = p.start.split('-'), res = { hrStatus: 'Gửi offer', offer: 'vừa xong · bắt đầu ' + m[2] + '/' + m[1] + '/' + m[0] + ' · ' + DEMO.me.email, to: 'ungvien@example.com' };
@@ -1466,7 +1466,9 @@ function hrCard(c){
 function openInvite(){
   var c = cand(state.current); if (!c) return;
   keepComment();
-  state.inv = { ref: c.ref, mode: 'offline', link: '', people: [], other: '', step: 'form', err: '', preview: null, sending: false };
+  var cfg = state.data.invite || {};
+  state.inv = { ref: c.ref, mode: 'offline', link: '', people: [], other: '', step: 'form', err: '', preview: null, sending: false,
+    subject: cfg.subject || '[INSIDE BRIDGE VN] Thư Mời Tham Gia Phỏng Vấn', contact: cfg.contact || '' };
   renderInvite();
   $('#invWrap').classList.add('show'); $('#invWrap').setAttribute('aria-hidden', 'false');
 }
@@ -1475,11 +1477,13 @@ function invPayload(){
   var v = state.inv, h = state.hrDraft;
   var people = v.people.slice();
   v.other.split(/[\n,;]/).map(function(x){ return x.trim(); }).filter(Boolean).forEach(function(x){ people.push(x); });
-  return { mode: v.mode, date: h.date, time: h.time, link: v.link.trim(), interviewers: people };
+  return { mode: v.mode, date: h.date, time: h.time, link: v.link.trim(), interviewers: people, subject: v.subject.trim(), contact: v.contact.trim() };
 }
 function invValidate(p){
   if (p.mode === 'online' && !/^https?:\/\/\S+$/i.test(p.link)) return 'Vui lòng dán link Google Meet (bắt đầu bằng https://).';
   if (!p.interviewers.length) return 'Chọn ít nhất 1 người phỏng vấn.';
+  if (!p.subject) return 'Nhập tiêu đề email.';
+  if (p.mode === 'offline' && !p.contact) return 'Nhập người liên hệ khi đến (tên - số điện thoại).';
   return '';
 }
 function renderInvite(){
@@ -1502,12 +1506,14 @@ function renderInvite(){
       (c.invite ? '<div class="inv-warn">Ứng viên đã được gửi thư mời (' + esc(c.invite) + '). Gửi lại sẽ gửi thêm một email mới.</div>' : '') +
       '<div class="inv-meta"><span>Tới</span><b>' + esc(c.email || '—') + '</b><span>Từ</span><b>' + esc(cfg.from || 'hr@insidegroup.co.kr') + '</b>' +
         '<span>Thời gian</span><b>' + esc(dayLabel(h.date)) + ' · ' + esc(h.time) + ' <span class="last">(đổi ở mục HR)</span></b></div>' +
+      '<div class="inv-f"><label class="t" for="invSubj">Tiêu đề email</label><input type="text" id="invSubj" value="' + esc(v.subject) + '"></div>' +
       '<div class="inv-f"><label class="t">Hình thức</label><div class="seg2">' +
         '<button type="button" data-invmode="offline" class="' + (v.mode === 'offline' ? 'on' : '') + '">' + ICON.building + 'Offline tại văn phòng</button>' +
         '<button type="button" data-invmode="online" class="' + (v.mode === 'online' ? 'on' : '') + '">' + ICON.video + 'Online (Google Meet)</button></div></div>' +
       (v.mode === 'online'
         ? '<div class="inv-f"><label class="t" for="invLink">Link Google Meet</label><input type="url" id="invLink" placeholder="https://meet.google.com/xxx-xxxx-xxx" value="' + esc(v.link) + '"></div>'
-        : '<div class="inv-f"><label class="t">Địa điểm (tự điền vào email)</label><div class="inv-info"><b>' + esc(cfg.company || '') + '</b><br>' + esc(cfg.address || '') + '<br><span class="last">Khi đến liên hệ: <b>' + esc(cfg.contact || '') + '</b></span></div></div>') +
+        : '<div class="inv-f"><label class="t">Địa điểm (tự điền vào email)</label><div class="inv-info"><b>' + esc(cfg.company || '') + '</b><br>' + esc(cfg.address || '') + '</div></div>' +
+          '<div class="inv-f"><label class="t" for="invContact">Khi đến liên hệ (tên - số điện thoại)</label><input type="text" id="invContact" placeholder="Ví dụ: Nhi - 0344342454" value="' + esc(v.contact) + '"></div>') +
       '<div class="inv-f"><label class="t">Người phỏng vấn</label><div class="inv-people">' + all.map(function(p){
         var on = v.people.indexOf(p) >= 0;
         return '<label class="' + (on ? 'on' : '') + '"><input type="checkbox" data-invp value="' + esc(p) + '"' + (on ? ' checked' : '') + '><span>' + esc(p) + '</span></label>';
@@ -1529,15 +1535,18 @@ function openOffer(){
   var c = cand(state.current); if (!c) return;
   keepComment();
   var sal = String(c.salary || '').replace(/\D/g, '');
-  state.inv = { kind: 'offer', ref: c.ref, position: c.position || '', start: isoFromDmy(c.avail), salary: sal ? Number(sal).toLocaleString('vi-VN') : '', step: 'form', err: '', preview: null, sending: false };
+  state.inv = { kind: 'offer', ref: c.ref, position: c.position || '', start: isoFromDmy(c.avail), salary: sal ? Number(sal).toLocaleString('vi-VN') : '', step: 'form', err: '', preview: null, sending: false, subject: '', subjectEdited: false };
+  state.inv.subject = offerSubject(state.inv.position);
   renderInvite();
   $('#invWrap').classList.add('show'); $('#invWrap').setAttribute('aria-hidden', 'false');
 }
-function ofPayload(){ var v = state.inv; return { position: v.position.trim(), start: v.start, salary: v.salary.replace(/\D/g, '') }; }
+function offerSubject(pos){ var pre = (state.data.invite || {}).offerPrefix || '[INSIDE BRIDGE VN] Thư mời làm việc - '; return pre + String(pos || '').trim().toUpperCase(); }
+function ofPayload(){ var v = state.inv; return { position: v.position.trim(), start: v.start, salary: v.salary.replace(/\D/g, ''), subject: (v.subject || '').trim() }; }
 function ofValidate(p){
   if (!p.position) return 'Nhập vị trí.';
   if (!/^\d{4}-\d{2}-\d{2}$/.test(p.start)) return 'Chọn ngày bắt đầu làm việc.';
   if (!p.salary || !+p.salary) return 'Nhập mức lương.';
+  if (!p.subject) return 'Nhập tiêu đề email.';
   return '';
 }
 function renderOffer(){
@@ -1556,6 +1565,7 @@ function renderOffer(){
     '<div class="inv-b">' +
       (c.offer ? '<div class="inv-warn">Ứng viên đã được gửi offer (' + esc(c.offer) + '). Gửi lại sẽ gửi thêm một email mới.</div>' : '') +
       '<div class="inv-meta"><span>Tới</span><b>' + esc(c.email || '—') + '</b><span>Từ</span><b>' + esc(cfg.from || 'hr@insidegroup.co.kr') + '</b></div>' +
+      '<div class="inv-f"><label class="t" for="ofSubj">Tiêu đề email</label><input type="text" id="ofSubj" value="' + esc(v.subject) + '"></div>' +
       '<div class="of-grid">' +
         '<div class="inv-f full"><label class="t" for="ofPos">Vị trí</label><input type="text" id="ofPos" value="' + esc(v.position) + '" placeholder="Ví dụ: E-commerce Executive"></div>' +
         '<div class="inv-f"><label class="t" for="ofDate">Ngày bắt đầu làm việc</label><input type="date" id="ofDate" value="' + esc(v.start) + '"></div>' +
@@ -1928,7 +1938,10 @@ document.addEventListener('input', function(e){
   if (e.target.id === 'comment') { state.draft.comment = e.target.value; updateSaveBtn(); }
   if (e.target.id === 'invLink' && state.inv) state.inv.link = e.target.value;
   if (e.target.id === 'invOther' && state.inv) state.inv.other = e.target.value;
-  if (e.target.id === 'ofPos' && state.inv) state.inv.position = e.target.value;
+  if (e.target.id === 'invSubj' && state.inv) state.inv.subject = e.target.value;
+  if (e.target.id === 'invContact' && state.inv) state.inv.contact = e.target.value;
+  if (e.target.id === 'ofSubj' && state.inv) { state.inv.subject = e.target.value; state.inv.subjectEdited = true; }
+  if (e.target.id === 'ofPos' && state.inv) { state.inv.position = e.target.value; if (!state.inv.subjectEdited) { state.inv.subject = offerSubject(e.target.value); var sj = $('#ofSubj'); if (sj) sj.value = state.inv.subject; } }
   if (e.target.id === 'ofDate' && state.inv) state.inv.start = e.target.value;
   if (e.target.id === 'ofSal' && state.inv) {
     var sd = e.target.value.replace(/\D/g, '').slice(0, 12);
