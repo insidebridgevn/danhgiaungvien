@@ -1757,9 +1757,11 @@ function linkEmbed(raw){
   }
   if (/canva\.com/.test(host) && (m = path.match(/\/design\/([\w-]+)/))) return Object.assign(out, { kind: 'Canva', src: 'https://www.canva.com/design/' + m[1] + '/view?embed' });
   if (/figma\.com/.test(host)) return Object.assign(out, { kind: 'Figma', src: 'https://www.figma.com/embed?embed_host=share&url=' + encodeURIComponent(url) });
-  if (/(^|\.)(facebook\.com|fb\.com|fb\.watch|linkedin\.com|pinterest\.[a-z.]+|dribbble\.com|x\.com|twitter\.com|threads\.net|github\.com|medium\.com)$/.test(host))
-    return Object.assign(out, { mode: 'shot', canWeb: false });
-  return out;
+  if (/(^|\.)(facebook\.com|fb\.com|fb\.watch|linkedin\.com|pinterest\.[a-z.]+|dribbble\.com|x\.com|twitter\.com|threads\.net|github\.com|medium\.com|canva\.site|linktr\.ee|sites\.google\.com)$/.test(host))
+    return Object.assign(out, { mode: 'shot', canWeb: false });   // these sites refuse to be shown inside another page
+  // Any other website: start with a full-page screenshot (always works for public pages);
+  // "Trang web" still tries the live, clickable page — many personal sites block that.
+  return Object.assign(out, { mode: 'shot' });
 }
 function shotUrl(url, n){ return 'https://s.wordpress.com/mshots/v1/' + encodeURIComponent(url) + '?w=1280&h=2400' + (n ? '&r=' + n : ''); }
 
@@ -1784,11 +1786,11 @@ function drawLink(){
   if (L.mode === 'image') { st.innerHTML = '<img class="shot" alt="" src="' + esc(L.src) + '">'; hint.textContent = ''; return; }
   if (L.mode === 'web') {
     st.innerHTML = '<iframe src="' + esc(L.src) + '" referrerpolicy="no-referrer" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
-    hint.textContent = (L.kind ? 'Đang xem ' + L.kind + ' ngay trong trang. ' : '') + 'Nếu khung trắng hoặc báo lỗi, bấm "Ảnh chụp trang".';
+    hint.textContent = (L.kind ? 'Đang xem ' + L.kind + ' ngay trong trang. ' : 'Trang web trực tiếp (bấm được). ') + 'Nếu khung trắng hoặc báo "từ chối kết nối", bấm "Ảnh chụp trang".';
     return;
   }
   // Screenshot of the whole page (for sites that refuse to be framed). The first request can take a few seconds.
-  hint.textContent = 'Ảnh chụp toàn trang để xem nhanh — bấm vào link không được. Cần bấm vào thì dùng "Mở tab mới".';
+  hint.textContent = 'Ảnh chụp toàn trang — cuộn để xem hết.' + (L.canWeb ? ' Muốn bấm được vào trang, thử "Trang web".' : ' Trang này không cho xem trực tiếp; cần bấm vào thì dùng "Mở tab mới".');
   st.innerHTML = '<div class="wait"><span class="spinner dark"></span><span>Đang chụp trang ' + esc(L.host) + '…</span></div>';
   var tries = 0, token = V.token;
   (function attempt(){
