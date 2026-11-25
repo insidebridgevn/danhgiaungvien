@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
+<meta name="darkreader-lock">
+<title>IBVN · Đánh giá ứng viên</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme:only light;
+    --bg:#FBF8F4; --surface:#FFFFFF; --soft:#F3EEE8; --ink:#17161B; --ink-2:#2A2830; --muted:#6B6670; --line:#ECE6DF;
+    --accent:#C8385E; --accent-dark:#A82A4C; --accent-soft:#F8E6EA; --ok:#1F8A5B; --err:#C2362F;
+    --radius:16px; --shadow:0 1px 2px rgba(23,22,27,.04),0 8px 24px rgba(23,22,27,.06); --max:1440px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:'Be Vietnam Pro',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer;border:none;background:none}
+  [hidden]{display:none!important}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+  svg{flex:none}
+
+  /* Top bar */
+  .top{position:sticky;top:0;z-index:40;background:rgba(251,248,244,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .top .wrap{display:flex;align-items:center;gap:12px;height:62px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px;letter-spacing:.02em}
+  .brand-mark{width:34px;height:34px;border-radius:10px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:13px}
+  .brand small{display:block;font-weight:500;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);line-height:1.1}
+  .top-right{margin-left:auto;display:flex;align-items:center;gap:8px;min-width:0}
+  .icon-btn{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:var(--ink-2);border:1px solid var(--line);background:var(--surface)}
+  .icon-btn:hover{border-color:#D8D0C6}
+  .icon-btn.spin svg{animation:spin .8s linear infinite}
+  .me{display:flex;align-items:center;gap:10px;padding:4px 12px 4px 4px;border:1px solid var(--line);border-radius:999px;background:var(--surface);min-width:0}
+  .me .av{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;text-transform:uppercase}
+  .me b{display:block;font-size:13px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+  .me span{display:block;font-size:11px;color:var(--muted);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+  @media (max-width:640px){.me .txt{display:none}.me{padding:4px}.brand small{display:none}}
+
+  /* Head */
+  .head{padding:28px 0 18px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+  .head h1{font-size:clamp(24px,3vw,32px);font-weight:800;letter-spacing:-.015em;line-height:1.2;margin-top:4px}
+  .head p{color:var(--muted);margin-top:4px}
+  .pending{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dark);font-weight:700;font-size:13px}
+  .pending .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+
+  /* Tools */
+  .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .search{position:relative;flex:1;min-width:200px;max-width:340px}
+  .search input{width:100%;height:42px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:0 14px 0 40px;outline:none}
+  .search input:focus,.sel:focus{border-color:var(--ink)}
+  .search svg{position:absolute;left:13px;top:12px;width:18px;height:18px;color:var(--muted)}
+  .sel{height:42px;border:1px solid var(--line);border-radius:12px;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%236B6670' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 14px center;padding:0 36px 0 14px;appearance:none;-webkit-appearance:none;outline:none;max-width:100%}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+  @media (min-width:641px){.chips{flex-wrap:wrap;overflow:visible}}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:600;color:var(--ink-2);white-space:nowrap}
+  .chip .n{min-width:22px;height:20px;padding:0 6px;border-radius:999px;background:var(--soft);font-size:11px;display:grid;place-items:center}
+  .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chip.on .n{background:rgba(255,255,255,.18)}
+
+  /* List */
+  .list{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .row{display:grid;grid-template-columns:minmax(0,228fr) minmax(0,180fr) minmax(0,108fr) minmax(0,104fr) minmax(0,120fr) minmax(0,250fr) minmax(0,138fr);gap:12px;align-items:center;padding:14px 20px;border-top:1px solid var(--line);width:100%;text-align:left}
+  .row.th{border-top:none;background:#FBF9F6;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:12px;padding-bottom:12px}
+  button.row{transition:background .12s}
+  button.row:hover{background:#FCFAF7}
+  button.row.active{background:var(--accent-soft)}
+  .cand{display:flex;align-items:center;gap:12px;min-width:0}
+  .av-lg{position:relative;width:40px;height:40px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--ink-2);flex:none}
+  .av-lg .new{position:absolute;right:-1px;top:-1px;width:11px;height:11px;border-radius:50%;background:var(--accent);border:2px solid #fff}
+  .cand b{display:block;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+  .newdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:7px;vertical-align:2px}
+  .cand small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cell-pos b{display:block;font-weight:600;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+  .cell-pos,.cell-meta>span{min-width:0}
+  .tag{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--ink-2);margin-top:3px}
+  .muted{color:var(--muted)}
+  .m-label{display:none}
+  .eval{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+  .stars-sm{color:#E3A008;font-size:12px;letter-spacing:1px}
+  .stars-sm i{color:#DDD5CB;font-style:normal}
+  .empty{padding:48px 20px;text-align:center;color:var(--muted)}
+  .sk{height:64px;border-top:1px solid var(--line);background:linear-gradient(90deg,#F6F1EB 0%,#FBF8F4 50%,#F6F1EB 100%);background-size:200% 100%;animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+
+  @media (max-width:1060px){
+    .row{grid-template-columns:1fr auto;gap:6px 12px;padding:16px}
+    .row .cand{grid-column:1/2}
+    .row .eval{grid-column:1/-1;flex-direction:column;gap:4px}
+    .row .hrcell{grid-column:1/-1}
+    .row .hrcell:empty{display:none}
+    .row .cell-pos{grid-column:1/-1}
+    .row .meta{display:inline}
+    .row .cell-meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px}
+    .m-label{display:inline;color:var(--muted)}
+    .row .hide-m{display:none}
+  }
+  @media (min-width:1061px){.row .cell-meta{display:contents}}
+
+  /* Header filters */
+  .row.th{padding-top:6px;padding-bottom:6px}
+  .hcell{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 8px;margin-left:-8px;max-width:calc(100% + 8px);overflow:hidden;border-radius:8px;font:inherit;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;white-space:nowrap;position:relative;justify-self:start}
+  .hcell:hover,.hcell.open{background:#F1ECE5;color:var(--ink)}
+  .hcell svg{opacity:.55;flex:none}
+  .hcell>span{overflow:hidden;text-overflow:ellipsis}
+  @media (min-width:1061px) and (max-width:1365px){
+    .hcell{white-space:normal;height:auto;min-height:34px;padding:4px 8px;line-height:1.25}
+    .hcell>span{overflow:visible}
+    .eval .rvv{flex-wrap:wrap;row-gap:2px}
+  }
+  .hcell.sorted,.hcell.filtered{color:var(--accent-dark)}
+  .hcell.sorted svg,.hcell.filtered svg{opacity:1}
+  .hcell .fdot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .colmenu{position:fixed;z-index:70;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px -12px rgba(23,22,27,.28);display:flex;flex-direction:column;overflow:hidden}
+  .cm-body{overflow-y:auto;padding:6px}
+  .cm-sec{padding:6px 4px}
+  .cm-sec+.cm-sec{border-top:1px solid var(--line)}
+  .cm-h{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:4px 8px 6px}
+  .cm-link{font-size:11px;font-weight:700;color:var(--accent);text-transform:none;letter-spacing:0}
+  .cm-opt{display:flex;align-items:center;gap:8px;width:100%;padding:8px;border-radius:8px;text-align:left;font-size:13px;font-weight:500}
+  .cm-opt:hover{background:var(--soft)}
+  .cm-opt.on{font-weight:700;color:var(--accent-dark)}
+  .cm-sp{width:16px;display:inline-block}
+  .cm-list{max-height:240px;overflow-y:auto}
+  .cm-check{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;font-size:13px;cursor:pointer}
+  .cm-check:hover{background:var(--soft)}
+  .cm-check input{width:16px;height:16px;accent-color:var(--accent);flex:none}
+  .cm-check span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cm-check em{font-style:normal;font-size:11px;color:var(--muted);background:var(--soft);border-radius:999px;padding:1px 7px}
+  .cm-empty{font-size:12px;color:var(--muted);padding:6px 8px}
+  .cm-range{display:flex;align-items:center;gap:8px;padding:0 8px 6px}
+  .cm-range input{flex:1;min-width:0;height:38px;border:1px solid var(--line);border-radius:10px;padding:0 10px;outline:none;font-variant-numeric:tabular-nums}
+  .cm-range input:focus{border-color:var(--ink)}
+  .chip-clear{color:var(--accent-dark);border-style:dashed}
+  .chip-hidden svg,.chip-clear svg{width:14px;height:14px}
+  .live{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#1F7A50;padding:0 4px;cursor:default}
+  .live i{width:8px;height:8px;border-radius:50%;background:#22A06B;box-shadow:0 0 0 0 rgba(34,160,107,.5);animation:livep 2s infinite}
+  @keyframes livep{70%{box-shadow:0 0 0 7px rgba(34,160,107,0)}100%{box-shadow:0 0 0 0 rgba(34,160,107,0)}}
+  @keyframes flash{0%{background:#FFF1C9}100%{background:transparent}}
+  button.row.flash{animation:flash 2.4s ease-out}
+  button.row.is-hidden{opacity:.55}
+  .hid-tag{color:var(--err);font-weight:700}
+  .fresh{display:inline-block;vertical-align:2px;margin-left:4px;padding:1px 6px;border-radius:999px;background:var(--accent);color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.06em}
+  .hid-banner{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:#FBE7E6;color:#8E2420;font-size:13px;font-weight:600;margin-bottom:14px}
+  .hid-banner .btn{height:34px;padding:0 12px;margin-left:auto;background:#fff;color:#8E2420;font-size:13px}
+  .card.admin{border-style:dashed}
+  .btn-danger{background:#fff;color:var(--err);border:1px solid #F0C9C6}
+  .btn-danger:hover{background:#FDF2F1}
+  .toast .t-act{margin-left:12px;color:#FFD3DE;font-weight:700;text-decoration:underline;cursor:pointer;background:none;border:none;font:inherit;pointer-events:auto}
+  .toast.show{pointer-events:auto}
+  @media (max-width:1060px){
+    .list .row.th{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;scrollbar-width:none;background:#FBF9F6}
+    .list .row.th::-webkit-scrollbar{display:none}
+    .hcell{flex:none;margin-left:0;border:1px solid var(--line);background:#fff;border-radius:999px;height:32px;padding:0 12px;letter-spacing:.04em;max-width:none}
+  }
+
+  /* Status pills */
+  .pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;border:1px solid transparent}
+  .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+  .t-none,.opt.on.t-none{background:#fff;border-color:var(--line);color:var(--muted)}
+  .t-green,.opt.on.t-green{background:#E6F4EC;color:#1F7A50}
+  .t-amber,.opt.on.t-amber{background:#FDF3DC;color:#946200}
+  .t-red,.opt.on.t-red{background:#FBE7E6;color:#B42F29}
+  .t-blue,.opt.on.t-blue{background:#E5EEFB;color:#2457A6}
+  .t-gray,.opt.on.t-gray{background:#EEEBE7;color:#5E5963}
+  .t-purple,.opt.on.t-purple{background:#EFE8FB;color:#6B3FA0}
+  .pill.sm{height:22px;font-size:11px;padding:0 8px}
+  .eval{gap:6px}
+  .rvv{display:flex;align-items:center;flex-wrap:nowrap;gap:5px;min-width:0}
+  .rv{display:flex;align-items:center;gap:4px;flex-wrap:nowrap;font-size:12px;line-height:1.3;max-width:100%}
+  .rv .who{font-weight:700;color:var(--ink-2);flex:none;width:70px;line-height:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rv .who.is-me{color:var(--accent-dark)}
+  .rv .pill{flex:none}
+  .rv .stars-sm{flex:none;letter-spacing:0}
+  .rv .todo{color:var(--muted);font-style:italic}
+  .hrcell{display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-size:12px}
+  .mailtag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#5E5963;background:#EEEBE7;border-radius:999px;padding:2px 8px;white-space:nowrap}
+  .mailtag.no{background:#fff;border:1px dashed #D6CDC2;color:#9A8F84}
+  .mailtag svg{width:12px;height:12px}
+  .hrcell .iv{display:inline-flex;align-items:center;gap:5px;font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums}
+  .rlist{display:grid;gap:12px}
+  .ritem{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#FDFCFA}
+  .ritem .rtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ritem .rtop b{font-size:13px}
+  .ritem .c{margin-top:6px;white-space:pre-wrap;color:var(--ink-2)}
+  .ritem .t{margin-top:6px;font-size:11px;color:var(--muted)}
+  .ritem.todo{border-style:dashed;background:transparent;color:var(--muted);font-size:13px}
+  .hr-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:2px}
+  .hr-line .lbl{font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--muted)}
+  .card.hr{border-color:#D9E4F5;background:linear-gradient(180deg,#F7FAFF,#fff 60%)}
+  .card h3 .badge{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:#E5EEFB;color:#2457A6;font-size:10px;letter-spacing:.06em}
+  .dt{display:grid;grid-template-columns:1.3fr 1fr;gap:10px;margin-top:14px}
+  .dt label{display:block;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
+  .dt input,.dt select{width:100%;height:44px;border:1px solid var(--line);border-radius:12px;background:#FDFCFA;padding:0 12px;outline:none;font-variant-numeric:tabular-nums}
+  .dt select{appearance:none;-webkit-appearance:none;background:#FDFCFA url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%236B6670' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;padding-right:32px}
+  .dt input:focus,.dt select:focus{border-color:var(--ink);background-color:#fff}
+  .dt .err{grid-column:1/-1;font-size:12px;color:var(--err)}
+  .dt .dwrap{position:relative}
+  .date-field{width:100%;height:44px;border:1px solid var(--line);border-radius:12px;background:#FDFCFA;padding:0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;font-variant-numeric:tabular-nums}
+  .date-field.ph{color:var(--muted)}
+  .date-field.open,.date-field:focus{border-color:var(--ink);background:#fff;outline:none}
+  .date-field svg{color:var(--muted)}
+  .dp{position:absolute;z-index:30;top:calc(100% + 6px);left:0;width:296px;max-width:calc(100vw - 48px);background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 40px -12px rgba(23,22,27,.28);padding:12px}
+  .dp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .dp-head b{font-size:14px}
+  .dp-head button{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--ink-2)}
+  .dp-head button:hover{background:var(--soft)}
+  .dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+  .dp-grid .wd{font-size:11px;font-weight:700;color:var(--muted);padding:4px 0}
+  .dp-grid button{height:36px;border-radius:9px;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
+  .dp-grid button:hover{background:var(--soft)}
+  .dp-grid button.out{color:#C9C1B7}
+  .dp-grid button.we{color:var(--accent-dark)}
+  .dp-grid button.today{box-shadow:inset 0 0 0 1.5px var(--ink)}
+  .dp-grid button.sel{background:#2457A6;color:#fff;font-weight:700}
+  .dp-foot{display:flex;justify-content:space-between;margin-top:8px}
+  .dp-foot button{font-size:12px;font-weight:700;color:#2457A6;padding:6px 8px;border-radius:8px}
+  .dp-foot button:hover{background:#EEF3FC}
+  .btn-hr{color:#fff;background:linear-gradient(135deg,#3B6FC4,#2457A6);box-shadow:0 8px 20px -8px rgba(36,87,166,.6)}
+  .btn-hr:hover{transform:translateY(-1px)}
+  .invite-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px dashed #D9E4F5}
+  .btn-invite{color:#fff;background:linear-gradient(135deg,#E5577F,#C8385E 55%,#A82A4C);box-shadow:0 8px 20px -8px rgba(200,56,94,.6)}
+  .btn-invite:hover{transform:translateY(-1px)}
+  .btn-invite.sent{background:#E9E5E0;color:#5E5963;box-shadow:none}
+  .btn-invite.sent:hover{background:#DEDAD4}
+  .btn-invite svg{width:16px;height:16px}
+  .btn-offer{color:#fff;background:linear-gradient(135deg,#2FA36B,#1E8656 55%,#166B44);box-shadow:0 8px 20px -8px rgba(30,134,86,.6)}
+  .btn-offer:hover{transform:translateY(-1px)}
+  .btn-offer.sent{background:#E9E5E0;color:#5E5963;box-shadow:none}
+  .btn-offer svg{width:16px;height:16px}
+  .mailtag.offer{background:#E3F4EA;color:#166B44}
+  .of-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .of-grid .full{grid-column:1/-1}
+  .of-sal{position:relative}
+  .of-sal span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
+  .of-sal input{padding-right:120px}
+  @media (max-width:640px){.of-grid{grid-template-columns:1fr}}
+  .inv-wrap{position:fixed;inset:0;z-index:85;background:rgba(23,22,27,.45);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .18s}
+  .inv-wrap.show{opacity:1;pointer-events:auto}
+  .inv{width:min(680px,100%);max-height:calc(100vh - 32px);background:var(--bg);border-radius:18px;box-shadow:0 30px 60px -20px rgba(23,22,27,.45);display:flex;flex-direction:column;overflow:hidden}
+  .inv-h{display:flex;align-items:flex-start;gap:12px;padding:18px 20px;background:#fff;border-bottom:1px solid var(--line)}
+  .inv-h h2{font-size:18px;font-weight:800}
+  .inv-h p{color:var(--muted);font-size:13px;margin-top:2px}
+  .inv-h .icon-btn{margin-left:auto;flex:none}
+  .inv-b{padding:18px 20px;overflow-y:auto;display:grid;gap:16px}
+  .inv-f label.t{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .inv-meta{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .inv-meta span{color:var(--muted)}
+  .inv-meta b{font-weight:600;overflow-wrap:anywhere}
+  .seg2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .seg2 button{height:46px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+  .seg2 button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dark);box-shadow:inset 0 0 0 1px var(--accent)}
+  .inv input[type=url],.inv input[type=text],.inv input[type=date]{width:100%;font:inherit;color:var(--ink);height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 12px;outline:none}
+  .inv input[type=url]:focus,.inv input[type=text]:focus,.inv input[type=date]:focus{border-color:var(--ink)}
+  .inv-info{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6}
+  .inv-people{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .inv-people label{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:13px;cursor:pointer}
+  .inv-people label.on{border-color:var(--accent);background:var(--accent-soft)}
+  .inv-people input{width:16px;height:16px;accent-color:var(--accent);flex:none}
+  .inv-err{color:var(--err);font-size:13px;font-weight:600}
+  .inv-warn{background:#FFF4D6;color:#6B4E00;border-radius:10px;padding:10px 12px;font-size:13px}
+  .inv-f-row{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;background:#fff;border-top:1px solid var(--line);flex-wrap:wrap}
+  .inv-prev{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .inv-prev .sub{padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px}
+  .inv-prev .mailbox{display:block;max-height:440px;overflow:auto;background:#fff!important;color:#222!important}
+  @media (max-width:640px){.inv-people{grid-template-columns:1fr}.inv{max-height:calc(100vh - 16px)}.inv-wrap{padding:8px}}
+  .ro{display:grid;gap:8px}
+  .ro .k{font-size:12px;color:var(--muted)}
+  .ro .v{font-weight:600;white-space:pre-wrap}
+  .contact{display:grid;gap:10px}
+  .ct{display:flex;align-items:center;gap:10px;min-width:0}
+  .ct .ic{width:34px;height:34px;border-radius:10px;background:var(--soft);display:grid;place-items:center;flex:none}
+  .ct .val{flex:1;min-width:0;font-weight:600;color:var(--ink);overflow-wrap:anywhere;user-select:all;-webkit-user-select:all}
+  .cp{flex:none;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:700;color:var(--ink-2);transition:all .15s}
+  .cp:hover{border-color:var(--ink)}
+  .cp.done{background:#E6F4EC;border-color:#BFE3CF;color:#1F7A50}
+  .demo button{margin-left:6px;padding:2px 10px;border-radius:999px;border:1px solid #E6C873;font-weight:700;font-size:12px}
+  .demo button.on{background:#6B4E00;color:#fff;border-color:#6B4E00}
+  .opt.on.t-none{color:var(--ink)}
+
+  /* Drawer */
+  .backdrop{position:fixed;inset:0;background:rgba(23,22,27,.32);z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+  .backdrop.show{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(540px,100%);background:var(--bg);z-index:60;transform:translateX(100%);transition:transform .25s cubic-bezier(.2,.8,.2,1),visibility 0s .25s;display:flex;flex-direction:column;visibility:hidden}
+  .drawer.show{transform:none;visibility:visible;transition:transform .25s cubic-bezier(.2,.8,.2,1);box-shadow:-20px 0 40px rgba(23,22,27,.12)}
+  .d-top{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .d-top .count{font-size:12px;color:var(--muted);margin-right:auto;padding-left:4px}
+  .navbtn{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 12px 0 8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:600;color:var(--ink)}
+  .navbtn.next{padding:0 8px 0 12px}
+  .navbtn:hover:not([disabled]){border-color:var(--ink)}
+  .navbtn[disabled]{opacity:.35;cursor:default}
+  .navbtn svg{width:18px;height:18px}
+  .v-nav{display:flex;align-items:center;gap:6px}
+  .v-nav .v-count{font-size:12px;color:rgba(255,255,255,.7);min-width:44px;text-align:center}
+  .v-navbtn{display:inline-flex;align-items:center;gap:4px;height:38px;padding:0 12px 0 8px;border-radius:10px;color:#fff;background:rgba(255,255,255,.12);font-size:13px;font-weight:600}
+  .v-navbtn.next{padding:0 8px 0 12px}
+  .v-navbtn:hover:not([disabled]){background:rgba(255,255,255,.22)}
+  .v-navbtn[disabled]{opacity:.3;cursor:default}
+  .v-navbtn svg{width:18px;height:18px}
+  @media (max-width:640px){.navbtn span,.v-navbtn span{display:none}.navbtn,.v-navbtn{padding:0 8px}}
+  .d-body{flex:1;overflow-y:auto;padding:22px 22px 28px;-webkit-overflow-scrolling:touch}
+  .d-name{font-size:24px;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+  .d-sub{color:var(--muted);margin-top:4px}
+  .d-sub b{color:var(--ink-2);font-weight:600}
+  .files{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+  .file-btn{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);text-align:left;transition:border-color .15s,box-shadow .15s,transform .15s}
+  .file-btn:hover{border-color:var(--accent);box-shadow:0 8px 20px -10px rgba(200,56,94,.45);transform:translateY(-1px)}
+  .file-btn .fi{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+  .file-btn b{display:block;font-size:14px}
+  .file-btn span{display:block;font-size:12px;color:var(--muted)}
+  .file-btn.primary{background:linear-gradient(135deg,#E5577F,#C8385E);border-color:transparent;color:#fff}
+  .file-btn.primary .fi{background:rgba(255,255,255,.18);color:#fff}
+  .file-btn.primary span{color:rgba(255,255,255,.8)}
+  .file-btn[disabled]{opacity:.55;pointer-events:none}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-top:12px}
+  .card h3{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .info{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .info label{display:block;font-size:12px;color:var(--muted)}
+  .info b{font-weight:600}
+  .msg{white-space:pre-wrap;color:var(--ink-2)}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:13px;color:var(--ink-2);transition:all .12s}
+  .opt:hover{border-color:#CFC6BB}
+  .opt.on{border-color:transparent;box-shadow:inset 0 0 0 2px currentColor}
+  .stars{display:flex;gap:4px;margin-top:16px;align-items:center}
+  .stars button{font-size:26px;line-height:1;color:#DDD5CB;padding:2px;transition:transform .1s}
+  .stars button.on{color:#E3A008}
+  .stars button:hover{transform:scale(1.12)}
+  .stars .lbl{margin-left:8px;font-size:12px;color:var(--muted)}
+  textarea{width:100%;min-height:96px;margin-top:14px;border:1px solid var(--line);border-radius:12px;background:#FDFCFA;padding:12px 14px;outline:none;resize:vertical}
+  textarea:focus{border-color:var(--ink);background:#fff}
+  .save-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 20px;border-radius:12px;font-weight:700;font-size:14px;white-space:nowrap;transition:transform .12s,box-shadow .12s,opacity .12s}
+  .btn-primary{color:#fff;background:linear-gradient(135deg,#E5577F,#C8385E 55%,#A82A4C);box-shadow:0 8px 20px -8px rgba(200,56,94,.6)}
+  .btn-primary:hover{transform:translateY(-1px)}
+  .btn[disabled]{opacity:.45;pointer-events:none;box-shadow:none}
+  .last{font-size:12px;color:var(--muted)}
+  .spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+  .spinner.dark{border-color:rgba(255,255,255,.25);border-top-color:#fff;width:28px;height:28px;border-width:3px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Viewer */
+  .viewer{position:fixed;inset:0;z-index:80;background:rgba(18,17,21,.97);display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .18s}
+  .viewer.show{opacity:1;pointer-events:auto}
+  .v-top{display:flex;align-items:center;gap:8px;padding:10px 14px;color:#fff;border-bottom:1px solid rgba(255,255,255,.1)}
+  .v-title{flex:1;min-width:0}
+  .v-title b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+  .v-title span{font-size:12px;color:rgba(255,255,255,.6)}
+  .v-btn{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.08)}
+  .v-btn:hover{background:rgba(255,255,255,.16)}
+  .v-zoom{font-size:12px;color:rgba(255,255,255,.7);min-width:42px;text-align:center}
+  .v-body{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;position:relative}
+  .v-pages{display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 16px 40px}
+  .v-pages canvas,.v-pages img{display:block;background:#fff;border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:none}
+  .v-pages img{max-width:100%;height:auto}
+  .v-state{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:14px;color:rgba(255,255,255,.85);text-align:center;padding:24px}
+  .v-state .btn{background:#fff;color:var(--ink)}
+  .v-frame{width:100%;height:100%;border:0;background:#fff;display:block}
+  .v-note{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 16px;background:#2A2830;color:rgba(255,255,255,.85);font-size:13px}
+  .v-note a{color:#fff;font-weight:700}
+  @media (max-width:640px){.v-zoom,.v-hide-m{display:none}}
+
+  /* Gate & toast */
+  .gate{max-width:480px;margin:12vh auto;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:40px 28px}
+  .gate .ic{width:64px;height:64px;margin:0 auto 18px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+  .gate h1{font-size:22px;font-weight:800}
+  .gate p{color:var(--muted);margin-top:8px}
+  .gate code{display:inline-block;margin-top:14px;padding:6px 12px;border-radius:8px;background:var(--soft);font-family:ui-monospace,Menlo,monospace;font-size:13px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:500;z-index:100;transition:all .25s;max-width:calc(100% - 32px)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.error{background:var(--err)}
+  .demo{background:#FFF4D6;color:#6B4E00;font-size:12px;text-align:center;padding:6px 12px}
+  footer{padding:28px 0 40px;color:var(--muted);font-size:12px;text-align:center}
+  /* Team-code login */
+  .login{max-width:420px;text-align:left}
+  .login h1{text-align:center}
+  .login>p{text-align:center}
+  .lg-f{display:grid;gap:6px;margin-top:14px}
+  .lg-f label{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .lg-f select,.lg-f input{width:100%;height:46px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 14px;font-size:15px;outline:none}
+  .lg-f select:focus,.lg-f input:focus{border-color:var(--ink)}
+  .lg-note{margin-top:12px;font-size:13px;line-height:1.5;background:#FFF4D6;color:#6B4E00;border-radius:10px;padding:10px 12px}
+  .lg-ok{margin-top:12px;font-size:13px;line-height:1.5;background:#E6F4EC;color:#1F6B47;border-radius:10px;padding:10px 12px}
+  .lg-err{margin-top:10px;font-size:13px;font-weight:600;color:var(--err);min-height:18px}
+  .lg-actions{display:grid;gap:8px;margin-top:16px}
+  .lg-actions .btn{width:100%;height:46px}
+  .lg-link{justify-self:center;font-size:13px;color:var(--muted);text-decoration:underline;padding:4px}
+  .top-btn{height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:600;white-space:nowrap}
+  .top-btn:hover{border-color:var(--ink)}
+  @media (max-width:640px){.top-btn{padding:0 10px;font-size:12px}}
+  .acc-list{display:grid;gap:10px}
+  .acc{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .acc b{font-size:15px}
+  .acc .meta{grid-column:1;font-size:12px;color:var(--muted);line-height:1.5}
+  .acc .acts{grid-column:2;grid-row:1/3}
+  .acc .tagx{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:2px}
+  .tagx.req{background:#FFE7D6;color:#A8431B}.tagx.lock{background:#FDE2E1;color:#A3262A}.tagx.none{background:#F1EEEA;color:#6B6670}.tagx.ok{background:#E6F4EC;color:#1F6B47}
+</style>
+</head>
+<body>
+<div class="demo" id="demoBanner" hidden>Bản xem trước — dữ liệu mẫu. Xem với vai trò: <button data-demo="leader" class="on">Brand</button><button data-demo="hr">Management</button><button data-demo="admin">Quản lý trang</button></div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><span class="brand-mark">IB</span><span>Leader Review<small>Inside Bridge Vietnam</small></span></div>
+    <div class="top-right" id="topRight" hidden>
+      <button class="icon-btn" id="refresh" title="Tải lại dữ liệu" aria-label="Tải lại dữ liệu"></button>
+      <button class="top-btn" id="accBtn" data-accounts hidden>Quản lý tài khoản</button>
+      <button class="top-btn" id="logoutBtn" data-logout hidden>Đăng xuất</button>
+      <div class="me"><span class="av" id="meAv"></span><span class="txt"><b id="meEmail"></b><span id="meDepts"></span></span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app">
+  <div class="head"><div><span class="kicker">Hồ sơ ứng tuyển</span><h1>Đánh giá ứng viên</h1><p>Đang tải dữ liệu…</p></div></div>
+  <div class="list"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>
+</main>
+<footer>Thông tin liên hệ của ứng viên được ẩn với leader. Cần liên hệ ứng viên, vui lòng làm việc với Quản lý trang.</footer>
+<div class="inv-wrap" id="accWrap" aria-hidden="true" role="dialog" aria-label="Quản lý tài khoản"><div class="inv" id="acc"></div></div>
+
+<div class="backdrop" id="backdrop"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" role="dialog" aria-label="Chi tiết ứng viên"></aside>
+
+<div class="viewer" id="viewer" aria-hidden="true" role="dialog" aria-label="Xem file">
+  <div class="v-top">
+    <div class="v-title"><b id="vName"></b><span id="vSub"></span></div>
+    <div class="v-nav"><button class="v-navbtn" id="vPrev" data-vnav="-1" title="Ứng viên trước (phím ←)"></button><span class="v-count" id="vCount"></span><button class="v-navbtn next" id="vNext" data-vnav="1" title="Ứng viên sau (phím →)"></button></div>
+    <span class="v-zoom" id="vZoomLbl"></span>
+    <button class="v-btn v-pdf" data-zoom="-1" aria-label="Thu nhỏ"></button>
+    <button class="v-btn v-pdf" data-zoom="1" aria-label="Phóng to"></button>
+    <button class="v-btn v-hide-m" id="vDownload" aria-label="Tải về"></button>
+    <button class="v-btn" id="vClose" aria-label="Đóng"></button>
+  </div>
+  <div class="v-body" id="vBody"><div class="v-pages" id="vPages"></div></div>
+</div>
+
+<div class="inv-wrap" id="invWrap" aria-hidden="true" role="dialog" aria-label="Gửi thư mời phỏng vấn"><div class="inv" id="inv"></div></div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   Setup
+   ============================================================ */
+/* ------------------------------------------------------------
+   CONFIG — paste the Leader Apps Script /exec link below.
+   Leave it empty to preview with sample data.
+   ------------------------------------------------------------ */
+var API_URL = '';
+var IS_GAS = false;              // kept for older code paths
+var IS_DEMO = !API_URL;
+var TOKEN_KEY = 'ibvn_review_token', LAST_ACCT_KEY = 'ibvn_review_team';
+function store(k, v){ try { if (v === undefined) return localStorage.getItem(k) || ''; if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) { return ''; } }
+var PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+
+var ICON = {
+  search:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  refresh:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>',
+  x:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  left:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>',
+  right:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  up:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>',
+  down:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  doc:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
+  folder:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+  plus:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  minus:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg>',
+  dl:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
+  lock:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  mail:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+  phone:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  cal:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
+  caret:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+  arrowUp:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  arrowDown:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>',
+  check:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  eyeOff:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18M10.6 6.1A10 10 0 0 1 12 6c5 0 9 6 9 6a17 17 0 0 1-3.2 3.7M6.6 6.6C4.3 8.1 3 12 3 12s4 6 9 6a9 9 0 0 0 4.4-1.1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
+  eye:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  send:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>',
+  video:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/></svg>',
+  building:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1M10 21v-3h4v3"/></svg>',
+  copy:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
+  ext:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
+};
+
+var state = { data: null, filter: 'all', q: '', pos: 'all', hrf: 'all', current: null, draft: null, hrDraft: null, saving: false, dp: null };
+
+/* ============================================================
+   Demo data (only used outside Apps Script)
+   ============================================================ */
+var SAMPLE_PDF = 'JVBERi0xLjQKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVsdmV0aWNhLUJvbGQgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YyIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNCAwIG9iago8PAovQ29udGVudHMgOSAwIFIgL01lZGlhQm94IFsgMCAwIDU5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCA4IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago1IDAgb2JqCjw8Ci9Db250ZW50cyAxMCAwIFIgL01lZGlhQm94IFsgMCAwIDU5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCA4IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iago2IDAgb2JqCjw8Ci9QYWdlTW9kZSAvVXNlTm9uZSAvUGFnZXMgOCAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjcgMCBvYmoKPDwKL0F1dGhvciAoYW5vbnltb3VzKSAvQ3JlYXRpb25EYXRlIChEOjIwMjYxMDIwMDkwNjU2KzA3JzAwJykgL0NyZWF0b3IgKGFub255bW91cykgL0tleXdvcmRzICgpIC9Nb2REYXRlIChEOjIwMjYxMDIwMDkwNjU2KzA3JzAwJykgL1Byb2R1Y2VyIChSZXBvcnRMYWIgUERGIExpYnJhcnkgLSBcKG9wZW5zb3VyY2VcKSkgCiAgL1N1YmplY3QgKHVuc3BlY2lmaWVkKSAvVGl0bGUgKHVudGl0bGVkKSAvVHJhcHBlZCAvRmFsc2UKPj4KZW5kb2JqCjggMCBvYmoKPDwKL0NvdW50IDIgL0tpZHMgWyA0IDAgUiA1IDAgUiBdIC9UeXBlIC9QYWdlcwo+PgplbmRvYmoKOSAwIG9iago8PAovRmlsdGVyIFsgL0FTQ0lJODVEZWNvZGUgL0ZsYXRlRGVjb2RlIF0gL0xlbmd0aCAxMDE1Cj4+CnN0cmVhbQpHYXRuJD8jUTMpJjtLWlAvKj0uPicjTHEqKy4oV1dPYGZZP1o6Umk9ZT0tbmAwWlVEVVE2aU8xSTBXR19Ia0lrZ1dlSCxyXl5gJEQ0IzlPRmBlM3BIWmlaVUFFOm9WIUU/S04waWBbclsyXDc+TWI3OEElSD01RVdrUCxIOkBeQDFyNWomZjs5Pi1FaDVuRjc5Nj4jMiklZ11MLSRbRFMrXy8rQVNLNy5WQiozW09bTTwsL1YwaHFvalxCK0UhPChSNjhmJFgnVi1BR1pGNCgkNCwsbFMoa15RPGddPGtZTyo1TTt1YmJWZzkmSyVYNThLTF9sNGYmRVk/Y18rZ1pLLSkyMjE7SGFCMDswL207PV9jSmRHJDM6RSUsZUNFZmJrbko0Ny1dYDk9UGEmRTo3XGNhbUk5VVhmKllybTUoayNaYWBoSi8uaTMsSSJhS10lcGdmcFBVUDBtSyEibi5xKFRHTSErVW1nLVpfQlVBMFovOmoucVVTNEc7b14uLXFyMmlzMDc0LyE2X2BGVU5saWQqLDZkLXQ7LSU4YltgWHJHYGlQX0k9aV1odTBLKFFdP2M2dUBMdSUkbmJMaSoiTWJJTHMuTDQqXStzVm00T2hQNkxTLDM8Iig7WTg2WnEvOktOVWstR2pwJiRiak9GbCNJLShrIUZoWjpFWC1NZ3BWazI4dGNwUCs6cjs5Zmw+RCUxQ1VoKksiajlTa2dtLDpUXDVuKkhiWV4pVGQmXzYpQ0MxP21rRlAqbmkuXWZGPWZcOWYlIyY7OlpfN2BwOURPcHVlYUxMZC4zN1crckgrOnVDUDJaaiprYVdtKkphQFw8QUxVOG9eW2RJXTdXN0Qta1BkNlVnQC5COSxZVmonPEE0PyFcaG8pOUQ2TXBVYU9daXJvWFJscW1jRzQxM3RqRG5waWhIaEZPb21gWEo9X2swKW5vUzQhS3UjS2VYTCJqPk1UMFVMWWIlUi9xPFsmOl47OmtLRkc0bnAmcClgX0xNSkg8W2RKXGBjLW44VVJJW0I/NzZYUURdVVc6JVwmRHBZV18tc0NSJE1FXTNHVz8+b1llQFU+RWY9SWhKPTVJZj5HT0FDKkJuazIiPS9ZKCs3aWY9bEpXMldnPlpWTXA9PyNoIXJgc3MwXUFJPWhmPDRcYj0ydWk9SilvUTleKGJdJjAmQk4haGNpIlcmTzJpYGA9b2AsIUs8U0xJSHFgJzcwdF9VXCo6bFx1SVJeQV1RTzNoRV9Lci1mRC1NX0RSLjdTMkYmPkpWSisqZ0ZyQGkwOixZOy4/TihhJi5iJF9TKm09Vk9JV0dKVWRPWSxmLjJUU1dpMmhhWS5KNkBuJH4+ZW5kc3RyZWFtCmVuZG9iagoxMCAwIG9iago8PAovRmlsdGVyIFsgL0FTQ0lJODVEZWNvZGUgL0ZsYXRlRGVjb2RlIF0gL0xlbmd0aCAzNTQKPj4Kc3RyZWFtCkdhcm88OTVYZWMmNEg4X1U2Ylc2ZkZBPDpdOl5GTSs8ZlxPRkNyYSluQ1gmSSJFRjtVbnEwQlw7RDFZQkhJWFVfYkQ9V000KCtxKnMhZi06b0VvJ0c3YVEndWQ9W1c4K2swQVVKbFVcaGomN1MtJ2M6IztTO2I4ZSsiSlkiZzdxKWFWaU5oYlEhZDNZTW5kMFtKbSY4NStWbE1DOVYpJnJrUkkxLzA8JGM+VlptWipyXGFKLVglSm1FTV02LEM+L0hHbTV0dFcxZ1xPRS44KUBKLWhWaW43Wm1NUS9jPVcvVmQjYEFUS1U/VWhIY2U4QWI2JGlMSUs+bjZVXTZhPmdJJ190JVUxTDkrXyNCXSlVPGYhNHNyXTxERig9Z0ZkQj0hXlBhaEJyJUZnQyhROWBOVmFFWyJKQFdkVDwpdExJYjotZV9rMjw1RjIuP3A7WHRDTUprUHJIWCczaGVsRD9+PmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDExCjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDA2MSAwMDAwMCBuIAowMDAwMDAwMTAyIDAwMDAwIG4gCjAwMDAwMDAyMDkgMDAwMDAgbiAKMDAwMDAwMDMyMSAwMDAwMCBuIAowMDAwMDAwNTI0IDAwMDAwIG4gCjAwMDAwMDA3MjggMDAwMDAgbiAKMDAwMDAwMDc5NiAwMDAwMCBuIAowMDAwMDAxMDU3IDAwMDAwIG4gCjAwMDAwMDExMjIgMDAwMDAgbiAKMDAwMDAwMjIyOCAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9JRCAKWzw1MWFmMmU5MmNhNGMzMmU3NDM4NjQ3Y2QxOTE3ZTkyNj48NTFhZjJlOTJjYTRjMzJlNzQzODY0N2NkMTkxN2U5MjY+XQolIFJlcG9ydExhYiBnZW5lcmF0ZWQgUERGIGRvY3VtZW50IC0tIGRpZ2VzdCAob3BlbnNvdXJjZSkKCi9JbmZvIDcgMCBSCi9Sb290IDYgMCBSCi9TaXplIDExCj4+CnN0YXJ0eHJlZgoyNjczCiUlRU9GCg==';
+var DEMO_ME = {
+  leader: { email: 'marketing@insidegroup.co.kr', label: 'Brand', depts: ['E-commerce', 'Marketing'], isHr: false, canReview: true },
+  hr: { email: 'management', label: 'Management', depts: ['Admin', 'Kế toán', 'Thông dịch', 'Nhân sự', 'Legal'], isHr: false, canReview: true },
+  admin: { email: 'ibvn@insidegroup.co.kr', label: 'Quản lý trang', depts: ['Tất cả phòng ban'], isHr: true, canReview: false, isAdmin: true }
+};
+var DEMO_SIG = '<table cellpadding="0" cellspacing="0" border="0" style="margin-top:20px;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif"><tr>' +
+  '<td style="padding:0 20px 0 0;vertical-align:middle"><img src="data:image/png;base64,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" width="120" alt="Inside Bridge Group" style="display:block;width:120px;height:auto"></td>' +
+  '<td style="vertical-align:top;font-size:14px;line-height:1.45;color:#222;max-width:340px"><div style="font-size:17px;font-weight:bold;margin:0 0 10px;color:#111">HR TEAM</div>' +
+  '<b style="color:#B4610E">M</b>. <a href="tel:+84775110684" style="color:#1155CC">+84 775110684</a><br><b style="color:#B4610E">E.</b> <a href="mailto:hr@insidegroup.co.kr" style="color:#1155CC">hr@insidegroup.co.kr</a><br>' +
+  '<a href="https://www.insidegroup.co.kr" style="color:#B4610E">www.insidegroup.co.kr</a><br>No. 4, Nguyen Ba Huan Street, An Khanh Ward, Ho Chi Minh City, Vietnam</td></tr></table>';
+var DEMO = {
+  me: DEMO_ME.leader,
+  statuses: ['Hẹn phỏng vấn', 'Cân nhắc thêm', 'Không phù hợp', 'Đạt phỏng vấn', 'Không đạt phỏng vấn'],
+  hrStatuses: ['Đã liên hệ', 'Đã hẹn PV', 'Từ chối PV', 'Huỷ PV', 'Backup', 'Gửi offer'],
+  invite: { interviewers: ['Mr. Joseph Kim - CEO', 'Ms. Nhã Trân - Country Manager', 'Mr. Tùng Nguyễn - Sales Team Leader', 'Mr. Phát - Brand Team Leader', 'Ms. Michelle - Senior Ecom', 'Mr. Nam - Warehouse Team Leader'],
+    company: 'CÔNG TY TNHH INSIDE BRIDGE VN', address: 'Số 4, Nguyễn Bá Huân, Phường An Khánh, TP. Hồ Chí Minh, Việt Nam', contact: 'Nhi - 0344342454', from: 'hr@insidegroup.co.kr',
+    offer: { company: 'Công ty TNHH Inside Bridge Việt Nam', address: 'Số 4, Nguyễn Bá Huân, Phường An Khánh, Thành phố Hồ Chí Minh, Việt Nam', hours: 'T2-T6 08:00 – 17:30; nghỉ trưa 11h50-13h30', probation: '02 tháng, 85% lương chính thức' } },
+  candidates: [
+    { ref:'IBVN-261020-K2LQ', date:'2026-10-20 08:41', position:'Digital Performance Executive', dept:'Marketing', name:'Trần Minh Anh', yob:'1999', exp:'2 – 3 năm', salary:'18.000.000', avail:'01/11/2026', message:'Em đã chạy Shopee Ads và TikTok Ads cho 2 brand mỹ phẩm Hàn trong 2 năm, rất mong được trao đổi thêm.', hasCv:true, portfolio:'link',
+      reviewers:['marketing@insidegroup.co.kr'], reviews:[] },
+    { ref:'IBVN-261019-P8ZD', date:'2026-10-19 21:05', position:'E-commerce Executive', dept:'E-commerce', name:'Lê Hoàng Phúc', yob:'1997', exp:'3 – 5 năm', salary:'22.000.000', avail:'15/11/2026', message:'', hasCv:true, portfolio:'',
+      reviewers:['e-com@insidegroup.co.kr', 'marketing@insidegroup.co.kr'], reviews:[] },
+    { ref:'IBVN-261019-M3TA', date:'2026-10-19 16:20', position:'Affiliate Executive', dept:'E-commerce', name:'Nguyễn Thảo Vy', yob:'2001', exp:'1 – 2 năm', salary:'14.000.000', avail:'03/11/2026', message:'Có kinh nghiệm quản lý hơn 200 KOC trên TikTok Shop.', hasCv:true, portfolio:'file',
+      reviewers:['e-com@insidegroup.co.kr', 'marketing@insidegroup.co.kr'],
+      reviews:[{ by:'e-com@insidegroup.co.kr', status:'Hẹn phỏng vấn', rating:4, comment:'Kinh nghiệm KOC tốt, hẹn PV thứ 5.', at:'2026-10-19 17:02' }],
+      hrStatus:'Đã hẹn PV', interview:'23/10/2026 14:30' },
+    { ref:'IBVN-261018-X7WB', date:'2026-10-18 10:12', position:'Digital Performance Executive', dept:'Marketing', name:'Phạm Quốc Bảo', yob:'1996', exp:'Trên 5 năm', salary:'30.000.000', avail:'01/12/2026', message:'', hasCv:true, portfolio:'',
+      reviewers:['marketing@insidegroup.co.kr'],
+      reviews:[{ by:'marketing@insidegroup.co.kr', status:'Cân nhắc thêm', rating:3, comment:'Lương mong muốn hơi cao so với range.', at:'2026-10-18 14:30' }] },
+    { ref:'IBVN-261017-C5RN', date:'2026-10-17 09:48', position:'E-commerce Executive', dept:'E-commerce', name:'Đỗ Ngọc Hân', yob:'2002', exp:'Dưới 1 năm', salary:'10.000.000', avail:'27/10/2026', message:'', hasCv:true, portfolio:'',
+      reviewers:['e-com@insidegroup.co.kr', 'marketing@insidegroup.co.kr'],
+      reviews:[{ by:'e-com@insidegroup.co.kr', status:'Không phù hợp', rating:2, comment:'Chưa đủ kinh nghiệm vận hành sàn.', at:'2026-10-17 15:10' },
+               { by:'marketing@insidegroup.co.kr', status:'Không phù hợp', rating:2, comment:'', at:'2026-10-17 16:00' }] },
+    { ref:'IBVN-261016-H9QE', date:'2026-10-16 19:33', position:'Affiliate Executive', dept:'E-commerce', name:'Võ Gia Huy', yob:'1998', exp:'2 – 3 năm', salary:'16.000.000', avail:'10/11/2026', message:'', hasCv:true, portfolio:'link',
+      reviewers:['e-com@insidegroup.co.kr', 'marketing@insidegroup.co.kr'],
+      reviews:[{ by:'e-com@insidegroup.co.kr', status:'Đạt phỏng vấn', rating:5, comment:'PV tốt, đề xuất offer.', at:'2026-10-18 11:00' },
+               { by:'marketing@insidegroup.co.kr', status:'Đạt phỏng vấn', rating:4, comment:'Đồng ý offer.', at:'2026-10-18 11:40' }],
+      hrStatus:'Gửi offer', interview:'17/10/2026 10:00' },
+    { ref:'IBVN-260910-OLD1', date:'2026-09-10 09:15', position:'Affiliate Executive', dept:'E-commerce', name:'Lâm Bảo Ngọc', yob:'1999', exp:'1 – 2 năm', salary:'13.000.000', avail:'01/10/2026', message:'', hasCv:true, portfolio:'',
+      reviewers:['e-com@insidegroup.co.kr', 'marketing@insidegroup.co.kr'], reviews:[] }
+  ]
+};
+
+/* ============================================================
+   Helpers
+   ============================================================ */
+function $(s, r){ return (r||document).querySelector(s); }
+function $$(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function initials(name){ var p = String(name||'?').trim().split(/\s+/); return ((p.length > 1 ? p[p.length-2][0] : '') + (p[p.length-1][0] || '')).toUpperCase(); }
+function isoDate(s){
+  s = String(s || '');
+  var m = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?/.exec(s);
+  if (m) return m[1] + '-' + m[2] + '-' + m[3] + ' ' + (m[4] ? (m[4].length < 2 ? '0' : '') + m[4] + ':' + m[5] : '00:00');
+  m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/.exec(s);
+  if (m) { var p2 = function(x){ return (x.length < 2 ? '0' : '') + x; }; return m[3] + '-' + p2(m[2]) + '-' + p2(m[1]) + ' ' + (m[4] ? p2(m[4]) + ':' + m[5] : '00:00'); }
+  return s;
+}
+function fmtDate(s){ s = isoDate(s); var m = /^(\d{4})-(\d{2})-(\d{2})(?:\s+(\d{2}:\d{2}))?/.exec(s||''); return m ? m[3] + '/' + m[2] + '/' + m[1] + (m[4] ? ' · ' + m[4] : '') : (s||''); }
+function fmtDay(s){ s = isoDate(s); var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s||''); return m ? m[3] + '/' + m[2] + '/' + m[1] : (s||''); }
+function money(s){ return s ? esc(s) : '—'; }
+function toast(msg, err, action){
+  var el = $('#toast'); el.textContent = msg;
+  if (action) { var b = document.createElement('button'); b.className = 't-act'; b.textContent = action.label; b.onclick = function(){ el.className = 'toast'; action.fn(); }; el.appendChild(b); }
+  el.className = 'toast show' + (err ? ' error' : '');
+  clearTimeout(toast._t); toast._t = setTimeout(function(){ el.className = 'toast'; }, action ? 6000 : 3000);
+}
+function tone(st){
+  if (!st) return 't-none';
+  var map = { 'Hẹn phỏng vấn':'t-green', 'Cân nhắc thêm':'t-amber', 'Không phù hợp':'t-red', 'Đạt phỏng vấn':'t-blue', 'Không đạt phỏng vấn':'t-gray' };
+  if (map[st]) return map[st];
+  if (/không/i.test(st)) return 't-red';
+  if (/đạt|offer/i.test(st)) return 't-blue';
+  return 't-amber';
+}
+function hrTone(st){ return ({ 'Đã liên hệ':'t-purple', 'Đã hẹn PV':'t-green', 'Từ chối PV':'t-red', 'Huỷ PV':'t-red', 'Backup':'t-amber', 'Gửi offer':'t-blue' })[st] || (st ? 't-gray' : 't-none'); }
+function hrPill(st, sm){ return st ? '<span class="pill ' + (sm ? 'sm ' : '') + hrTone(st) + '">' + esc(st) + '</span>' : ''; }
+function ivParts(s){ var m = /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2})/.exec(s || ''); return m ? { date: m[3] + '-' + m[2] + '-' + m[1], time: m[4] } : { date: '', time: '' }; }
+function timeOpts(sel){ var out = '<option value="">--:--</option>'; for (var h = 7; h <= 21; h++) for (var q = 0; q < 60; q += 15) { if (h === 21 && q) break; var v = (h < 10 ? '0' : '') + h + ':' + (q ? q : '00'); out += '<option' + (v === sel ? ' selected' : '') + '>' + v + '</option>'; } return out; }
+function shortName(e){ var nm = state.data && state.data.names; if (nm && nm[e]) return nm[e]; var n = String(e || '').split('@')[0]; return n.charAt(0).toUpperCase() + n.slice(1); }
+function myRev(c){ var me = state.data.me.email; return (c.reviews || []).filter(function(r){ return r.by === me; })[0] || null; }
+function avgRating(c){ var r = (c.reviews || []).filter(function(x){ return x.rating; }); return r.length ? r.reduce(function(a, x){ return a + x.rating; }, 0) / r.length : 0; }
+function revStatuses(c){ var out = (c.reviews || []).map(function(r){ return r.status; }).filter(Boolean); return out.length ? out : ['Chưa đánh giá']; }
+var CLOSED_HR = ['Huỷ PV', 'Từ chối PV'];
+function isClosed(c){ return CLOSED_HR.indexOf(c.hrStatus) >= 0; }   // cancelled / declined interviews live in their own tab
+/** Can I evaluate this candidate? Server sends c.canReview (a leader only evaluates their own departments). */
+function canRev(c){ return c && c.canReview !== undefined ? !!c.canReview : !!state.data.me.canReview; }
+function isPending(c){ return !isClosed(c) && (canRev(c) ? !myRev(c) : !(c.reviews || []).length); }
+function reviewerList(c){
+  var list = (c.reviewers || []).slice();
+  (c.reviews || []).forEach(function(r){ if (list.indexOf(r.by) < 0) list.push(r.by); });
+  return list;
+}
+function evalCell(c){
+  var who = reviewerList(c), me = state.data.me.email;
+  if (!who.length) return pill('');
+  return who.map(function(e){
+    var r = (c.reviews || []).filter(function(x){ return x.by === e; })[0];
+    return '<span class="rv"><span class="who' + (e === me ? ' is-me' : '') + '" title="' + esc(e) + '">' + esc(e === me ? 'Bạn' : shortName(e)) + '</span>' +
+      '<span class="rvv">' + (r ? (r.status ? pill(r.status).replace('class="pill ', 'class="pill sm ') : '') + starsSm(r.rating) + (!r.status ? '<span class="todo">đã nhận xét</span>' : '')
+         : '<span class="todo">chưa đánh giá</span>') + '</span></span>';
+  }).join('');
+}
+function hrCell(c){
+  if (!c.hrStatus && !c.interview && !c.invite && !c.offer) return '';
+  return hrPill(c.hrStatus, true) + (c.interview ? '<span class="iv">' + ICON.cal + esc(c.interview) + '</span>' : '') +
+    (c.invite ? '<span class="mailtag" title="' + esc(c.invite) + '">' + ICON.mail + 'Mail sent</span>'
+              : c.interview ? '<span class="mailtag no">' + ICON.mail + 'Not sent</span>' : '') +
+    (c.offer ? '<span class="mailtag offer" title="' + esc(c.offer) + '">' + ICON.mail + 'Offer sent</span>' : '');
+}
+function hrLine(c){ if (!c.hrStatus && !c.interview) return ''; return '<span class="hr-line"><span class="lbl">HR</span>' + hrPill(c.hrStatus, true) + (c.interview ? '<span>' + ICON.cal + ' ' + esc(c.interview) + '</span>' : '') + '</span>'; }
+function pill(st){ return '<span class="pill ' + tone(st) + '">' + esc(st || 'Chưa đánh giá') + '</span>'; }
+function starsSm(){ return ''; }   // star ratings removed
+function errMsg(e){
+  var c = String((e && e.message) || e);
+  if (c.indexOf('NO_ACCESS') >= 0) return 'Bạn không có quyền xem hồ sơ này.';
+  if (c.indexOf('NO_FILE') >= 0) return 'Ứng viên không gửi file này.';
+  if (c.indexOf('BAD_STATUS') >= 0) return 'Trạng thái không hợp lệ.';
+  if (c.indexOf('INVITE_LINK') >= 0) return 'Vui lòng dán link Google Meet (bắt đầu bằng https://).';
+  if (c.indexOf('INVITE_PEOPLE') >= 0) return 'Chọn ít nhất 1 người phỏng vấn.';
+  if (c.indexOf('INVITE_MODE') >= 0) return 'Chọn hình thức Online hoặc Offline.';
+  if (c.indexOf('OFFER_POSITION') >= 0) return 'Nhập vị trí.';
+  if (c.indexOf('OFFER_DATE') >= 0) return 'Chọn ngày bắt đầu làm việc.';
+  if (c.indexOf('OFFER_SALARY') >= 0) return 'Nhập mức lương.';
+  if (c.indexOf('INVITE_NO_EMAIL') >= 0) return 'Ứng viên không có email hợp lệ.';
+  if (c.indexOf('INVITE_FROM') >= 0) { var who = (c.split('INVITE_FROM:')[1] || '').split(/\s/)[0]; return 'Không gửi được dưới tên hr@insidegroup.co.kr: trang đang chạy bằng tài khoản ' + (who || 'khác') + '. Cần deploy trang bằng hr@ hoặc thêm hr@ làm alias "Gửi thư dưới tên" trong Gmail.'; }
+  if (c.indexOf('BAD_TIME') >= 0) return 'Ngày giờ hẹn chưa hợp lệ (cần đủ ngày và giờ, bước 15 phút).';
+  if (c.indexOf('WRONG_CODE') >= 0) { var left = +(c.split('WRONG_CODE:')[1] || 0); return 'Mã chưa đúng.' + (left ? ' Còn ' + left + ' lần thử trước khi bị khoá tạm.' : ''); }
+  if (c.indexOf('LOCKED') >= 0) return 'Nhập sai quá nhiều lần. Thử lại sau ' + (c.split('LOCKED:')[1] || 15) + ' phút, hoặc nhờ Quản lý trang reset mã.';
+  if (c.indexOf('CODE_SHORT') >= 0) return 'Mã cần ít nhất 6 ký tự.';
+  if (c.indexOf('CODE_EXISTS') >= 0) return 'Phòng này vừa được tạo mã. Hãy nhập mã để đăng nhập.';
+  if (c.indexOf('NO_CODE') >= 0) return 'Phòng này chưa có mã. Hãy tạo mã lần đầu.';
+  if (c.indexOf('AUTH') >= 0) return 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(c)) return 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.';
+  return 'Có lỗi xảy ra, vui lòng thử lại.';
+}
+function call(fn, args){
+  if (IS_DEMO) return new Promise(function(resolve, reject){ setTimeout(function(){ try { resolve(DEMO_API[fn].apply(null, args || [])); } catch (e) { reject(e); } }, 450); });
+  // text/plain body = "simple" cross-site request, which Apps Script web apps accept
+  return fetch(API_URL, { method: 'POST', body: JSON.stringify({ fn: fn, args: args || [], token: state.token || '' }) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if (res && res.ok) return res.result;
+      var err = new Error((res && res.error) || 'SERVER');
+      if (err.message === 'AUTH' && !/^(authInfo|login|setCode|requestReset)$/.test(fn)) sessionExpired();
+      throw err;
+    });
+}
+function sessionExpired(){
+  state.token = ''; store(TOKEN_KEY, null);
+  if (state.authShown) return;
+  state.data = null; closeDrawer(); closeViewer(); closeAccounts();
+  renderLogin('Phiên đăng nhập đã hết hạn hoặc mã đã được reset. Vui lòng đăng nhập lại.');
+}
+var DEMO_API = {
+  adminAccounts: function(){
+    return [['SALES','Sales',['Sales'],1,''],['MARKETING','Marketing',['Marketing'],0,''],['ECOM','E-commerce',['E-commerce'],1,'25/11/2026 09:12'],['BRAND','Brand',['Marketing','E-commerce'],1,''],['MANAGEMENT','Management',['Admin','Kế toán','Thông dịch','Nhân sự','Legal'],0,''],['SITE_ADMIN','Quản lý trang',['Tất cả phòng ban'],1,'']]
+      .map(function(r){ return { key: r[0], label: r[1], depts: r[2], hasCode: !!r[3], created: r[3] ? '20/11/2026 10:00' : '', lastLogin: r[3] ? '25/11/2026 08:30' : '', resetRequested: r[4], locked: false, isMe: r[0] === 'SITE_ADMIN' }; });
+  },
+  adminReset: function(k){ return DEMO_API.adminAccounts().map(function(a){ if (a.key === k) { a.hasCode = false; a.resetRequested = ''; a.created = a.lastLogin = ''; } return a; }); },
+  getReviewData: function(){
+    var d = JSON.parse(JSON.stringify(DEMO));
+    d.names = { 'marketing@insidegroup.co.kr': 'Brand', 'e-com@insidegroup.co.kr': 'E-commerce', 'vnsales@insidegroup.co.kr': 'Sales', 'marketing-team': 'Marketing', 'management': 'Management', 'ibvn@insidegroup.co.kr': 'Quản lý trang' };
+    var limit = new Date(); limit.setMonth(limit.getMonth() - 1);
+    d.candidates.forEach(function(c){ var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(c.date); c.expired = !!m && new Date(+m[1], +m[2] - 1, +m[3]) <= limit; if (c.expired && !c.hidden) c.hidden = 'Tự ẩn'; });
+    if (!d.me.isHr) d.invite = null;
+    if (!d.me.isAdmin) d.candidates = d.candidates.filter(function(c){ return !c.hidden; });
+    else d.candidates.forEach(function(c){ c.hidden = c.hidden || ''; });
+    d.candidates.forEach(function(c, i){
+      c.hrStatus = c.hrStatus || ''; c.interview = c.interview || '';
+      if (d.me.isHr) { c.email = 'ungvien' + (i + 1) + '@example.com'; c.phone = '09000000' + (10 + i); }
+    });
+    return d;
+  },
+  getFile: function(ref, kind){
+    var c = DEMO.candidates.filter(function(x){ return x.ref === ref; })[0];
+    if (kind === 'portfolio' && c.portfolio === 'link') return { type:'link', url:'https://www.behance.net/' };
+    return { type:'pdf', name: c.name + (kind === 'portfolio' ? ' - Portfolio.pdf' : ' - CV.pdf'), mime:'application/pdf', data: SAMPLE_PDF };
+  },
+  saveReview: function(ref, status, rating, comment){
+    var at = new Date(); var p = function(n){ return (n < 10 ? '0' : '') + n; };
+    var stamp = at.getFullYear() + '-' + p(at.getMonth()+1) + '-' + p(at.getDate()) + ' ' + p(at.getHours()) + ':' + p(at.getMinutes());
+    var c = DEMO.candidates.filter(function(x){ return x.ref === ref; })[0];
+    c.reviews = c.reviews.filter(function(r){ return r.by !== DEMO.me.email; });
+    if (status || rating || comment) c.reviews.push({ by: DEMO.me.email, status: status, rating: rating, comment: comment, at: stamp });
+    return { reviews: JSON.parse(JSON.stringify(c.reviews)) };
+  },
+  setHidden: function(ref, hide){
+    var res = { hidden: hide ? 'Ẩn bởi ' + DEMO.me.email + ' · vừa xong' : '' };
+    DEMO.candidates.forEach(function(c){ if (c.ref === ref) c.hidden = res.hidden; });
+    return res;
+  },
+  previewInvite: function(ref, p){
+    var c = DEMO.candidates.filter(function(x){ return x.ref === ref; })[0];
+    var d = new Date(p.date + 'T00:00:00'), wd = ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'][d.getDay()];
+    var t = p.time.split(':'), m = p.date.split('-');
+    var when = (+t[0]) + 'h' + t[1] + ' ' + wd + ', ngày ' + m[2] + '/' + m[1] + '/' + m[0];
+    var cfg = DEMO.invite, P = 'margin:0 0 14px';
+    var html = '<div style="font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#222">' +
+      '<p style="' + P + '">Chào bạn <b>' + esc(c.name) + '</b></p>' +
+      '<p style="' + P + '">Công ty TNHH Inside Bridge Vietnam trân trọng cảm ơn bạn đã quan tâm và ứng tuyển vào vị trí <b>' + esc(c.position) + '</b> tại công ty.</p>' +
+      '<p style="' + P + '">Sau khi xem xét hồ sơ, công ty nhận thấy kinh nghiệm và định hướng của bạn phù hợp với vị trí đang tuyển dụng. Vì vậy, công ty xin mời bạn tham gia buổi phỏng vấn để trao đổi chi tiết hơn về công việc cũng như cơ hội phát triển trong thời gian tới.</p>' +
+      '<p style="margin:0 0 6px"><b>Thông tin phỏng vấn như sau:</b></p><ul style="margin:0 0 14px;padding-left:24px"><li>Thời gian: <b>' + when + '</b></li>' +
+      (p.mode === 'online' ? '<li>Hình thức: Online qua nền tảng Google Meet</li><li>Link: <a href="' + esc(p.link) + '">' + esc(p.link) + '</a></li>' : '<li>Địa điểm:<br>' + esc(cfg.company) + '<br>' + esc(cfg.address) + '</li>') + '</ul>' +
+      '<p style="margin:0"><b>Các nhân sự tham gia phỏng vấn:</b></p><p style="' + P + '">' + p.interviewers.map(function(x, i){ return (i + 1) + '. ' + esc(x); }).join('<br>') + '</p>' +
+      (p.mode === 'offline' ? '<p style="' + P + '">Khi đến, vui lòng liên hệ <b>' + esc(cfg.contact) + '</b> để được hỗ trợ.</p>' : '') +
+      '<p style="' + P + '">Để buổi phỏng vấn diễn ra thuận lợi, bạn vui lòng xác nhận tham gia bằng cách phản hồi email này. Trong trường hợp cần thay đổi thời gian, bạn có thể chủ động trao đổi để công ty sắp xếp phù hợp.</p>' +
+      '<p style="' + P + '">Rất mong được gặp bạn tại buổi phỏng vấn.</p><p style="margin:0">Trân trọng,</p>' + DEMO_SIG + '</div>';
+    return { to: 'ungvien@example.com', from: cfg.from, subject: '[INSIDE BRIDGE VN] Thư Mời Tham Gia Phỏng Vấn', html: html };
+  },
+  sendInvite: function(ref, p){
+    var m = p.date.split('-'), res = { hrStatus: 'Đã hẹn PV', interview: m[2] + '/' + m[1] + '/' + m[0] + ' ' + p.time, invite: 'vừa xong · ' + (p.mode === 'online' ? 'Online' : 'Offline') + ' · ' + DEMO.me.email, to: 'ungvien@example.com' };
+    DEMO.candidates.forEach(function(c){ if (c.ref === ref) Object.assign(c, res); });
+    return res;
+  },
+  previewOffer: function(ref, p){
+    var c = DEMO.candidates.filter(function(x){ return x.ref === ref; })[0], o = DEMO.invite.offer, P = 'margin:0 0 14px';
+    var pos = esc(p.position.toUpperCase()), m = p.start.split('-'), sal = String(p.salary).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    var html = '<div style="font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#222"><p style="margin:0">Dear <b>' + esc(c.name) + '</b></p>' +
+      '<p style="' + P + '">' + esc(o.company) + ' trân trọng gửi đến bạn thư mời làm việc cho vị trí <b>' + pos + '</b> tại công ty.</p>' +
+      '<p style="' + P + '">Sau quá trình trao đổi và đánh giá, chúng tôi nhận thấy năng lực và kinh nghiệm của bạn phù hợp với yêu cầu của vị trí và mong muốn được hợp tác cùng bạn trong thời gian tới.</p>' +
+      '<p style="' + P + '">Thông tin làm việc cụ thể như sau:</p><div style="margin:0 0 14px 40px"><b>Vị trí: ' + pos + '</b><br><b>Ngày bắt đầu làm việc:</b> ' + m[2] + '/' + m[1] + '/' + m[0] +
+      '<br><b>Thời gian làm việc:</b> ' + esc(o.hours) + '<br><b>Thời gian thử việc:</b> ' + esc(o.probation) + '<br><b>Mức lương:</b> ' + sal + ' VNĐ/tháng (gross)<br><b>Địa điểm làm việc:</b><br>' + esc(o.company) + '<br>' + esc(o.address) + '</div>' +
+      '<p style="' + P + '">Trong thời gian thử việc, căn cứ vào kết quả làm việc và mức độ phù hợp với môi trường công ty, chúng tôi sẽ xem xét ký kết hợp đồng lao động chính thức.</p>' +
+      '<p style="' + P + '">Nếu bạn đồng ý với các nội dung trên, vui lòng phản hồi email này để xác nhận.<br>Chúng tôi mong sớm được chào đón bạn gia nhập đội ngũ Inside Bridge Việt Nam.</p>' +
+      '<p style="margin:0">Trân trọng.</p>' + DEMO_SIG + '</div>';
+    return { to: 'ungvien@example.com', from: DEMO.invite.from, subject: '[INSIDE BRIDGE VN] Thư mời làm việc - ' + p.position.toUpperCase(), html: html };
+  },
+  sendOffer: function(ref, p){
+    var m = p.start.split('-'), res = { hrStatus: 'Gửi offer', offer: 'vừa xong · bắt đầu ' + m[2] + '/' + m[1] + '/' + m[0] + ' · ' + DEMO.me.email, to: 'ungvien@example.com' };
+    DEMO.candidates.forEach(function(c){ if (c.ref === ref) Object.assign(c, res); });
+    return res;
+  },
+  saveHr: function(ref, hrStatus, date, time){
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date || '');
+    var res = { hrStatus: hrStatus, interview: m ? m[3] + '/' + m[2] + '/' + m[1] + ' ' + time : '' };
+    DEMO.candidates.forEach(function(c){ if (c.ref === ref) Object.assign(c, res); });
+    return res;
+  }
+};
+
+/* ============================================================
+   Load + live updates (polling — Apps Script has no push)
+   ============================================================ */
+var POLL_MS = window.__POLL_MS || 15000;
+var live = { timer: null, busy: false, last: '', at: null };
+
+/* ============================================================
+   Team-code login
+   ============================================================ */
+function renderLogin(msg){
+  clearTimeout(live.timer);
+  state.authShown = true;
+  $('#topRight').hidden = true;
+  $('#app').innerHTML = '<div class="gate login"><div class="ic">' + ICON.lock + '</div><h1>Đánh giá ứng viên</h1><p>Chọn phòng ban của bạn và nhập mã để vào.</p>' +
+    (msg ? '<div class="lg-note">' + esc(msg) + '</div>' : '') + '<div id="lgBox"><div class="lg-f"><span class="spinner dark"></span></div></div></div>';
+  call('authInfo').then(function(info){
+    state.auth = info; drawLogin();
+  }).catch(function(e){
+    $('#lgBox').innerHTML = '<div class="lg-err">' + esc(errMsg(e)) + '</div><div class="lg-actions"><button class="btn btn-primary" data-lg-retry>Thử lại</button></div>';
+  });
+}
+function drawLogin(note){
+  var info = state.auth, last = store(LAST_ACCT_KEY);
+  var sel = state.lgAcct || (info.accounts.some(function(a){ return a.key === last; }) ? last : '');
+  state.lgAcct = sel;
+  var a = info.accounts.filter(function(x){ return x.key === sel; })[0];
+  var html = '<div class="lg-f"><label for="lgAcct">Phòng ban</label><select id="lgAcct"><option value="">Chọn phòng ban…</option>' +
+    info.accounts.map(function(x){ return '<option value="' + esc(x.key) + '"' + (x.key === sel ? ' selected' : '') + '>' + esc(x.label) + '</option>'; }).join('') + '</select></div>';
+  if (a && a.hasCode) {
+    html += '<div class="lg-f"><label for="lgCode">Mã đăng nhập</label><input id="lgCode" type="password" autocomplete="current-password" placeholder="Nhập mã của phòng"></div>' +
+      '<div class="lg-err" id="lgErr"></div>' + (note ? '<div class="lg-ok">' + esc(note) + '</div>' : '') +
+      '<div class="lg-actions"><button class="btn btn-primary" data-lg-login>Đăng nhập</button><button class="lg-link" data-lg-forgot>Quên mã?</button></div>';
+  } else if (a) {
+    html += '<div class="lg-note">Phòng <b>' + esc(a.label) + '</b> chưa có mã. Tạo mã lần đầu (ít nhất ' + info.minCode + ' ký tự). Những lần sau chỉ cần nhập mã này. Mã dùng chung cho cả phòng, nhớ lưu lại nhé.</div>' +
+      '<div class="lg-f"><label for="lgNew">Tạo mã</label><input id="lgNew" type="password" autocomplete="new-password" placeholder="Ít nhất ' + info.minCode + ' ký tự"></div>' +
+      '<div class="lg-f"><label for="lgNew2">Nhập lại mã</label><input id="lgNew2" type="password" autocomplete="new-password"></div>' +
+      '<div class="lg-err" id="lgErr"></div><div class="lg-actions"><button class="btn btn-primary" data-lg-create>Tạo mã &amp; vào trang</button></div>';
+  } else {
+    html += '<div class="lg-err" id="lgErr"></div>';
+  }
+  $('#lgBox').innerHTML = html;
+  var f = $('#lgCode') || $('#lgNew'); if (f) f.focus();
+}
+function lgBusy(btn, on, label){ if (!btn) return; btn.disabled = on; btn.innerHTML = on ? '<span class="spinner"></span>' + label : label; }
+function lgDone(res){
+  state.token = res.token; store(TOKEN_KEY, res.token); store(LAST_ACCT_KEY, state.lgAcct);
+  state.authShown = false; state.data = null;
+  $('#app').innerHTML = '<div class="head"><div><span class="kicker">Hồ sơ ứng tuyển</span><h1>Đánh giá ứng viên</h1><p>Đang tải dữ liệu…</p></div></div><div class="list"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>';
+  load();
+}
+function doLogin(){
+  var code = ($('#lgCode') || {}).value || '', btn = $('[data-lg-login]');
+  if (!code) { $('#lgErr').textContent = 'Nhập mã của phòng.'; return; }
+  lgBusy(btn, true, 'Đang kiểm tra…');
+  call('login', [state.lgAcct, code]).then(lgDone).catch(function(e){ lgBusy(btn, false, 'Đăng nhập'); $('#lgErr').textContent = errMsg(e); });
+}
+function doCreate(){
+  var a = ($('#lgNew') || {}).value || '', b = ($('#lgNew2') || {}).value || '', btn = $('[data-lg-create]');
+  if (a.length < state.auth.minCode) { $('#lgErr').textContent = 'Mã cần ít nhất ' + state.auth.minCode + ' ký tự.'; return; }
+  if (a !== b) { $('#lgErr').textContent = 'Hai lần nhập chưa khớp.'; return; }
+  lgBusy(btn, true, 'Đang tạo…');
+  call('setCode', [state.lgAcct, a]).then(lgDone).catch(function(e){
+    lgBusy(btn, false, 'Tạo mã &amp; vào trang'); $('#lgErr').textContent = errMsg(e);
+    if (String(e.message).indexOf('CODE_EXISTS') >= 0) call('authInfo').then(function(i){ state.auth = i; drawLogin(); });
+  });
+}
+function doForgot(){
+  var a = state.auth.accounts.filter(function(x){ return x.key === state.lgAcct; })[0]; if (!a) return;
+  if (!confirm('Gửi yêu cầu reset mã của phòng ' + a.label + ' tới Quản lý trang?')) return;
+  call('requestReset', [state.lgAcct]).then(function(){
+    drawLogin('Đã gửi yêu cầu. Báo Quản lý trang để reset mã; sau khi reset, chọn lại phòng ban và tạo mã mới.');
+  }).catch(function(e){ $('#lgErr').textContent = errMsg(e); });
+}
+function logout(){
+  if (!confirm('Đăng xuất khỏi trang đánh giá?')) return;
+  var t = state.token;
+  call('logout').catch(function(){}).then(function(){});
+  state.token = t ? '' : ''; store(TOKEN_KEY, null);
+  closeDrawer(); closeViewer(); closeAccounts(); state.data = null; state.lgAcct = '';
+  renderLogin();
+}
+
+/* ---- Quản lý tài khoản (site admin) ---- */
+function openAccounts(){
+  $('#accWrap').classList.add('show'); $('#accWrap').setAttribute('aria-hidden', 'false');
+  $('#acc').innerHTML = accHead() + '<div class="inv-b"><span class="spinner dark"></span></div>';
+  call('adminAccounts').then(drawAccounts).catch(function(e){ $('#acc .inv-b').innerHTML = '<div class="inv-err">' + esc(errMsg(e)) + '</div>'; });
+}
+function accHead(){ return '<div class="inv-h"><div><h2>Quản lý tài khoản</h2><p>Mỗi phòng ban dùng chung một mã. Reset để phòng đó tạo mã mới.</p></div><button class="icon-btn" data-accclose aria-label="Đóng">' + ICON.x + '</button></div>'; }
+function drawAccounts(list){
+  $('#acc').innerHTML = accHead() + '<div class="inv-b"><div class="acc-list">' + list.map(function(a){
+    var tags = (a.resetRequested ? '<span class="tagx req">Xin reset · ' + esc(a.resetRequested) + '</span>' : '') +
+      (a.locked ? '<span class="tagx lock">Đang khoá tạm</span>' : '') +
+      (a.hasCode ? '<span class="tagx ok">Đã có mã</span>' : '<span class="tagx none">Chưa tạo mã</span>');
+    return '<div class="acc"><div><b>' + esc(a.label) + '</b>' + tags + '</div>' +
+      '<div class="acts">' + (a.hasCode || a.resetRequested || a.locked ? '<button class="btn" style="background:var(--soft)" data-accreset="' + esc(a.key) + '" data-acclabel="' + esc(a.label) + '"' + (a.isMe ? ' data-accme="1"' : '') + '>Reset mã</button>' : '') + '</div>' +
+      '<div class="meta">Xem: ' + esc(a.depts.join(', ')) + (a.created ? ' · Tạo mã: ' + esc(a.created) : '') + (a.lastLogin ? ' · Vào gần nhất: ' + esc(a.lastLogin) : '') + '</div></div>';
+  }).join('') + '</div></div>';
+}
+function accReset(el){
+  var label = el.getAttribute('data-acclabel'), me = el.getAttribute('data-accme');
+  if (!confirm('Reset mã của ' + label + '? Mọi thiết bị của phòng này sẽ bị đăng xuất và phòng sẽ tạo mã mới ở lần vào tới.' + (me ? '\n\nĐây là tài khoản bạn đang dùng — bạn sẽ bị đăng xuất ngay.' : ''))) return;
+  el.disabled = true;
+  call('adminReset', [el.getAttribute('data-accreset')]).then(function(list){
+    if (me) { closeAccounts(); sessionExpired(); return; }
+    drawAccounts(list); toast('Đã reset mã ' + label);
+  }).catch(function(e){ el.disabled = false; toast(errMsg(e), true); });
+}
+function closeAccounts(){ var w = $('#accWrap'); if (!w) return; w.classList.remove('show'); w.setAttribute('aria-hidden', 'true'); }
+
+function load(manual){
+  var btn = $('#refresh'); if (btn) btn.classList.add('spin');
+  live.busy = true;
+  call('getReviewData').then(function(d){
+    live.busy = false; btn && btn.classList.remove('spin');
+    if (d.denied) return renderGate(d.email);
+    var first = !state.data;
+    var prev = state.data;
+    state.data = d;
+    live.last = JSON.stringify(d.candidates); live.at = new Date();
+    renderTop();
+    if (first || !$('#list')) renderPage(); else refreshParts();
+    if (prev && !first) announce(prev.candidates, d.candidates);
+    syncDrawer();
+    if (manual) toast('Đã cập nhật dữ liệu mới nhất');
+    schedule();
+  }).catch(function(e){
+    live.busy = false; btn && btn.classList.remove('spin');
+    if (String(e && e.message) === 'AUTH') return;                                   // login screen already shown
+    if (state.data) { schedule(); if (manual) toast(errMsg(e), true); return; }   // keep showing old data
+    if (/Chưa dán link/.test(String(e && e.message))) return renderGate(null, 'Trang chưa được cài đặt xong: thiếu link Google Sheet trong code (SHEET_URL).');
+    $('#app').innerHTML = '<div class="gate"><div class="ic">' + ICON.refresh + '</div><h1>Không tải được dữ liệu</h1><p>' + esc(errMsg(e)) + '</p><p style="font-size:12px;color:#9A8F84;word-break:break-word;max-width:520px;margin:6px auto 0">Chi tiết lỗi: ' + esc(String((e && e.message) || e)) + '</p><p><button class="btn btn-primary" onclick="load(true)">Thử lại</button></p></div>';
+  });
+}
+
+function poll(){
+  if (live.busy || document.visibilityState === 'hidden' || state.saving) return schedule();
+  live.busy = true;
+  call('getReviewData').then(function(d){
+    live.busy = false;
+    if (d.denied) return renderGate(d.email);
+    live.at = new Date(); liveLabel();
+    var sig = JSON.stringify(d.candidates);
+    if (sig !== live.last) {
+      var prev = state.data.candidates;
+      live.last = sig;
+      state.data = d;
+      refreshParts();
+      announce(prev, d.candidates);
+      syncDrawer();
+    }
+    schedule();
+  }).catch(function(){ live.busy = false; schedule(); });
+}
+function schedule(){ clearTimeout(live.timer); live.timer = setTimeout(poll, POLL_MS); }
+function liveLabel(){ var el = $('#liveAt'); if (el && live.at) el.title = 'Tự cập nhật mỗi ' + Math.round(POLL_MS / 1000) + ' giây · lần cuối ' + live.at.toLocaleTimeString('vi-VN'); }
+
+/** Flash changed rows + short notice when someone else changed something. */
+function announce(before, after){
+  var old = {}; before.forEach(function(c){ old[c.ref] = c; });
+  var changed = [], added = [];
+  after.forEach(function(c){
+    var o = old[c.ref];
+    if (!o) added.push(c);
+    else if (JSON.stringify(o.reviews) !== JSON.stringify(c.reviews) || o.hrStatus !== c.hrStatus || o.interview !== c.interview || (o.hidden || '') !== (c.hidden || '')) changed.push(c);
+  });
+  changed.concat(added).forEach(function(c){ var r = $('.row[data-ref="' + c.ref + '"]'); if (r) { r.classList.remove('flash'); void r.offsetWidth; r.classList.add('flash'); } });
+  if (added.length) {
+    added.forEach(function(c){ state.fresh[c.ref] = 1; });
+    refreshParts();   // re-render so the "MỚI" badges show
+    var visible = filtered().some(function(c){ return state.fresh[c.ref]; });
+    toast('Có ' + added.length + ' hồ sơ mới' + (visible ? '' : ' (đang bị bộ lọc ẩn)'), false, { label: 'Xem', fn: showFresh });
+    if (visible && window.pageYOffset < 400) scrollToFresh();
+  }
+  else if (changed.length === 1) {
+    var c = changed[0], o = old[c.ref];
+    var what;
+    if (o.hrStatus !== c.hrStatus || o.interview !== c.interview) what = 'HR: ' + (c.hrStatus || 'cập nhật') + (c.interview ? ' · ' + c.interview : '');
+    else {
+      var oldJ = (o.reviews || []).map(function(r){ return JSON.stringify(r); });
+      var r = (c.reviews || []).filter(function(x){ return oldJ.indexOf(JSON.stringify(x)) < 0; })[0];
+      what = r ? shortName(r.by) + ': ' + (r.status || 'cập nhật đánh giá') : 'cập nhật đánh giá';
+    }
+    toast(c.name + ' — ' + what);
+  } else if (changed.length > 1) toast(changed.length + ' hồ sơ vừa được cập nhật');
+}
+
+/** Keep the open drawer in sync without losing what the user is typing. */
+state.fresh = {};
+function scrollToFresh(){
+  var r = $$('#list button.row').filter(function(x){ return state.fresh[x.getAttribute('data-ref')]; })[0];
+  if (!r) return;
+  r.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  r.classList.remove('flash'); void r.offsetWidth; r.classList.add('flash');
+}
+/** Make sure new applications are on screen: clear filters if they hide them, sort newest first, scroll there. */
+function showFresh(){
+  if (!filtered().some(function(c){ return state.fresh[c.ref]; })) { state.cf = {}; state.filter = 'all'; state.q = ''; state.showHidden = false; var q = $('#q'); if (q) q.value = ''; }
+  state.sort = { by: 'date', dir: 'desc' };
+  closeMenu(); refreshParts();
+  setTimeout(scrollToFresh, 50);
+}
+
+function syncDrawer(){
+  if (!state.current) return;
+  var c = cand(state.current);
+  if (!c || (c.hidden && !state.showHidden && !state.data.me.isAdmin)) { closeDrawer(); toast('Hồ sơ này vừa bị ẩn khỏi trang'); return; }
+  if (!dirtyReview()) state.draft = draftFrom(c);
+  if (!dirtyHr()) { var iv = ivParts(c.interview); state.hrDraft = { hrStatus: c.hrStatus || '', date: iv.date, time: iv.time }; }
+  renderDrawer();
+}
+
+document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible' && state.data) { clearTimeout(live.timer); poll(); } });
+
+function renderGate(email, custom){
+  clearTimeout(live.timer);
+  $('#topRight').hidden = true;
+  $('#app').innerHTML = '<div class="gate"><div class="ic">' + ICON.lock + '</div>' +
+    '<h1>' + (custom ? 'Chưa sẵn sàng' : 'Tài khoản chưa được cấp quyền') + '</h1>' +
+    '<p>' + esc(custom || (email
+      ? 'Tài khoản này chưa có trong danh sách leader. Vui lòng liên hệ HR để được cấp quyền.'
+      : 'Không xác định được tài khoản. Hãy đăng nhập bằng email công ty @insidegroup.co.kr rồi tải lại trang.')) + '</p>' +
+    (email ? '<code>' + esc(email) + '</code>' : '') + '</div>';
+}
+
+function renderTop(){
+  var me = state.data.me;
+  $('#topRight').hidden = false;
+  $('#refresh').innerHTML = ICON.refresh;
+  $('#meAv').textContent = (me.label || me.email || '?')[0];
+  $('#meEmail').textContent = me.label || me.email;
+  $('#meDepts').textContent = me.depts.join(' · ') + (me.isAdmin ? ' · Quản lý' : me.isHr ? ' · HR' : '');
+  $('#accBtn').hidden = !me.isAdmin;
+  $('#logoutBtn').hidden = IS_DEMO;
+  liveLabel();
+}
+
+/* ============================================================
+   List page
+   ============================================================ */
+function cand(ref){ return (state.data.candidates || []).filter(function(c){ return c.ref === ref; })[0]; }
+
+/* --- column filters & sorting (header row) --- */
+var COLS = [
+  { key: 'name', label: 'Ứng viên', sorts: [['date', 'desc', 'Mới nộp nhất'], ['date', 'asc', 'Nộp cũ nhất'], ['name', 'asc', 'Tên A → Z'], ['name', 'desc', 'Tên Z → A']] },
+  { key: 'position', label: 'Vị trí', sorts: [['position', 'asc', 'A → Z'], ['position', 'desc', 'Z → A']], list: function(c){ return c.position; } },
+  { key: 'exp', label: 'Kinh nghiệm', sorts: [['exp', 'asc', 'Ít → nhiều'], ['exp', 'desc', 'Nhiều → ít']], list: function(c){ return c.exp; } },
+  { key: 'salary', label: 'Mức lương', sorts: [['salary', 'asc', 'Thấp → cao'], ['salary', 'desc', 'Cao → thấp']], range: true },
+  { key: 'avail', label: 'Ngày bắt đầu', sorts: [['avail', 'asc', 'Sớm nhất'], ['avail', 'desc', 'Muộn nhất']], list: function(c){ return c.avail; } },
+  { key: 'eval', label: 'Đánh giá leader', sorts: [],
+    groups: [['status', 'Có leader đánh giá', revStatuses]] },
+  { key: 'hr', label: 'HR', sorts: [['interview', 'asc', 'Lịch PV sớm nhất'], ['interview', 'desc', 'Lịch PV muộn nhất']],
+    groups: [['hr', 'Trạng thái HR', function(c){ return c.hrStatus || 'Chưa xử lý'; }], ['mail', 'Thư mời', function(c){ return c.invite ? 'Mail sent' : 'Not sent'; }]] }
+];
+state.sort = { by: 'date', dir: 'desc' };
+state.cf = {};          // column filters: { position: [...], exp: [...], avail: [...], status: [...], hr: [...], salMin, salMax }
+state.menu = null;      // open header menu key
+state.showHidden = false;
+
+function expRank(s){
+  s = String(s || '').toLowerCase();
+  if (!s) return 99;
+  if (/chưa|no exp/.test(s)) return 0;
+  if (/dưới|less/.test(s)) return 0.5;
+  var n = parseFloat((s.match(/\d+(\.\d+)?/) || [])[0]);
+  if (/trên|\+|more/.test(s)) return (n || 5) + 1;
+  return isNaN(n) ? 50 : n;
+}
+function salaryNum(s){ var d = String(s || '').replace(/\D/g, ''); return d ? +d : NaN; }
+function availNum(s){ var m = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(s || ''); return m ? +(m[3] + m[2] + m[1]) : (s ? 0 : 99999999); }
+function sortVal(c, by){
+  if (by === 'date') return isoDate(c.date);
+  if (by === 'name') { var p = String(c.name || '').trim().split(/\s+/); return (p[p.length - 1] + ' ' + c.name).toLowerCase(); }   // Vietnamese: sort by given name
+  if (by === 'position') return String(c.position || '').toLowerCase();
+  if (by === 'exp') return expRank(c.exp);
+  if (by === 'salary') { var n = salaryNum(c.salary); return isNaN(n) ? Infinity : n; }
+  if (by === 'avail') return availNum(c.avail);
+  if (by === 'rating') return avgRating(c);
+  if (by === 'interview') { var m = /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/.exec(c.interview || ''); return m ? +(m[3] + m[2] + m[1] + m[4] + m[5]) : null; }
+  return '';
+}
+function colActive(col){
+  var f = state.cf;
+  if (col.key === 'salary') return f.salMin != null || f.salMax != null;
+  if (col.key === 'eval') return !!(f.status && f.status.length);
+  if (col.key === 'hr') return !!((f.hr && f.hr.length) || (f.mail && f.mail.length));
+  return !!(f[col.key] && f[col.key].length);
+}
+function anyColFilter(){ return COLS.some(colActive); }
+
+function visibleBase(){
+  var all = state.data.candidates;
+  return state.showHidden ? all.filter(function(c){ return c.hidden; }) : all.filter(function(c){ return !c.hidden; });
+}
+
+function filtered(skipKey){
+  var q = state.q.trim().toLowerCase(), f = state.cf;
+  var list = visibleBase().filter(function(c){
+    if (state.filter === '__closed') { if (!isClosed(c)) return false; }
+    else if (state.filter !== 'all' && isClosed(c)) return false;
+    if (state.filter === '__none' && !isPending(c)) return false;
+    if (state.filter !== 'all' && state.filter !== '__none' && state.filter !== '__closed' && revStatuses(c).indexOf(state.filter) < 0) return false;
+    if (q && (c.name + ' ' + c.position + ' ' + c.ref).toLowerCase().indexOf(q) < 0) return false;
+    if (skipKey !== 'position' && f.position && f.position.length && f.position.indexOf(c.position) < 0) return false;
+    if (skipKey !== 'exp' && f.exp && f.exp.length && f.exp.indexOf(c.exp) < 0) return false;
+    if (skipKey !== 'avail' && f.avail && f.avail.length && f.avail.indexOf(c.avail) < 0) return false;
+    if (skipKey !== 'eval' && f.status && f.status.length && !revStatuses(c).some(function(v){ return f.status.indexOf(v) >= 0; })) return false;
+    if (skipKey !== 'hr' && f.hr && f.hr.length && f.hr.indexOf(c.hrStatus || 'Chưa xử lý') < 0) return false;
+    if (skipKey !== 'hr' && f.mail && f.mail.length && f.mail.indexOf(c.invite ? 'Mail sent' : 'Not sent') < 0) return false;
+    if (skipKey !== 'salary' && (f.salMin != null || f.salMax != null)) {
+      var n = salaryNum(c.salary);
+      if (isNaN(n) || (f.salMin != null && n < f.salMin) || (f.salMax != null && n > f.salMax)) return false;
+    }
+    return true;
+  });
+  var by = state.sort.by, dir = state.sort.dir === 'asc' ? 1 : -1;
+  return list.slice().sort(function(a, b){
+    var x = sortVal(a, by), y = sortVal(b, by);
+    if (x === null && y !== null) return 1; if (y === null && x !== null) return -1;   // empty values always last
+    if (x < y) return -dir; if (x > y) return dir;
+    var da = isoDate(a.date), db = isoDate(b.date);
+    return da < db ? 1 : da > db ? -1 : 0;   // tie-break: newest first
+  });
+}
+
+function renderPage(){
+  var d = state.data;
+  $('#app').innerHTML =
+    '<div class="head"><div><span class="kicker">Hồ sơ ứng tuyển</span><h1>Đánh giá ứng viên</h1>' +
+      '<p>Phòng ban: ' + esc(d.me.depts.join(', ')) + '</p></div><span id="pendingWrap"></span></div>' +
+    '<div class="tools">' +
+      '<label class="search">' + ICON.search + '<input id="q" type="search" placeholder="Tìm tên, vị trí, mã hồ sơ…" value="' + esc(state.q) + '"></label>' +
+      '<span class="live" id="liveAt"><i></i>Tự cập nhật</span><span id="clearWrap"></span>' +
+    '</div>' +
+    '<div class="chips" id="chips"></div>' +
+    '<div class="list" id="list"></div>';
+  refreshParts();
+  liveLabel();
+}
+
+function refreshParts(){
+  var d = state.data, base = d.candidates.filter(function(c){ return !c.hidden; });
+  var pending = base.filter(isPending).length;
+  var hiddenN = d.candidates.length - base.length;
+  var count = function(st){ return base.filter(function(c){ return !isClosed(c) && revStatuses(c).indexOf(st) >= 0; }).length; };
+  var closedN = base.filter(isClosed).length;
+  var pendLabel = d.me.canReview ? 'Bạn chưa đánh giá' : 'Chưa có đánh giá';
+  var chips = [['all', 'Tất cả', base.length], ['__none', pendLabel, pending]]
+    .concat(d.statuses.map(function(s){ return [s, s, count(s)]; }))
+    .concat([['__closed', 'Huỷ / Từ chối PV', closedN]]);
+  $('#pendingWrap').innerHTML = pending ? '<span class="pending"><span class="dot"></span>' + pending + (d.me.canReview ? ' hồ sơ bạn chưa đánh giá' : ' hồ sơ chưa có đánh giá') + '</span>' : '';
+  $('#chips').innerHTML = chips.map(function(c){
+      return '<button class="chip' + (!state.showHidden && state.filter === c[0] ? ' on' : '') + '" data-filter="' + esc(c[0]) + '">' + esc(c[1]) + '<span class="n">' + c[2] + '</span></button>';
+    }).join('') +
+    (d.me.isAdmin ? '<button class="chip chip-hidden' + (state.showHidden ? ' on' : '') + '" data-showhidden>' + ICON.eyeOff + 'Đã ẩn<span class="n">' + hiddenN + '</span></button>' : '') +
+    '';
+  $('#clearWrap').innerHTML = anyColFilter() ? '<button class="chip chip-clear" data-clearcf>' + ICON.x + 'Xoá bộ lọc cột</button>' : '';
+  renderList();
+}
+
+function renderList(){
+  var list = filtered();
+  var head = '<div class="row th">' + COLS.map(function(col){
+    var sorted = col.sorts.some(function(s){ return s[0] === state.sort.by; }) && !(col.key === 'name' && state.sort.by === 'date' && state.sort.dir === 'desc');
+    var arrow = sorted ? (state.sort.dir === 'asc' ? ICON.arrowUp : ICON.arrowDown) : '';
+    return '<button class="hcell' + (colActive(col) ? ' filtered' : '') + (sorted ? ' sorted' : '') + (state.menu === col.key ? ' open' : '') + '" data-col="' + col.key + '">' +
+      '<span>' + esc(col.label) + '</span>' + arrow + (colActive(col) ? '<i class="fdot"></i>' : '') + ICON.caret + '</button>';
+  }).join('') + '</div>';
+  $('#list').innerHTML = head +
+    (list.length ? list.map(function(c){
+      return '<button class="row' + (state.current === c.ref ? ' active' : '') + (c.hidden ? ' is-hidden' : '') + '" data-ref="' + esc(c.ref) + '">' +
+        '<span class="cand"><span style="min-width:0"><b>' + (!isPending(c) || c.hidden ? '' : '<i class="newdot" title="Chưa đánh giá"></i>') + esc(c.name) + (state.fresh[c.ref] ? ' <span class="fresh">MỚI</span>' : '') + '</b><small>Nộp ' + esc(fmtDay(c.date)) + (c.yob ? ' · ' + esc(c.yob) : '') + (c.hidden ? ' · <span class="hid-tag">' + (c.expired ? 'Quá 1 tháng' : 'Đã ẩn') + '</span>' : '') + '</small></span></span>' +
+        '<span class="cell-pos"><b>' + esc(c.position) + '</b><span class="tag">' + esc(c.dept || '—') + '</span></span>' +
+        '<span class="cell-meta">' +
+          '<span><span class="m-label">KN: </span>' + esc(c.exp || '—') + '</span>' +
+          '<span><span class="m-label">Lương: </span>' + money(c.salary) + '</span>' +
+          '<span><span class="m-label">Bắt đầu: </span>' + esc(c.avail || '—') + '</span>' +
+        '</span>' +
+        '<span class="eval">' + evalCell(c) + '</span>' +
+        '<span class="hrcell">' + hrCell(c) + '</span>' +
+      '</button>';
+    }).join('') : '<div class="empty">' + (state.showHidden ? 'Không có hồ sơ nào bị ẩn.' : 'Không có hồ sơ nào phù hợp bộ lọc.') + '</div>');
+  if (state.menu) positionMenu();
+}
+
+/* --- header menu --- */
+function openMenu(key){
+  state.menu = state.menu === key ? null : key;
+  renderList();
+  if (!state.menu) { closeMenu(); return; }
+  renderMenu();
+}
+function closeMenu(){ state.menu = null; var m = $('#colMenu'); if (m) m.remove(); $$('.hcell.open').forEach(function(b){ b.classList.remove('open'); }); }
+
+function renderMenu(){
+  var col = COLS.filter(function(c){ return c.key === state.menu; })[0]; if (!col) return;
+  var m = $('#colMenu');
+  if (!m) { m = document.createElement('div'); m.id = 'colMenu'; m.className = 'colmenu'; document.body.appendChild(m); }
+  var keepScroll = m.querySelector('.cm-body') ? m.querySelector('.cm-body').scrollTop : 0;
+  var html = !col.sorts.length ? '' : '<div class="cm-sec"><div class="cm-h">Sắp xếp</div>' + col.sorts.map(function(s){
+    var on = state.sort.by === s[0] && state.sort.dir === s[1];
+    return '<button class="cm-opt' + (on ? ' on' : '') + '" data-sort="' + s[0] + ':' + s[1] + '">' + (on ? ICON.check : '<span class="cm-sp"></span>') + esc(s[2]) + '</button>';
+  }).join('') + '</div>';
+
+  var base = filtered(col.key);   // counts ignore this column's own filter
+  function checklist(fkey, title, getter){
+    var counts = {}, order = [];
+    base.forEach(function(c){
+      var vals = getter(c); vals = Array.isArray(vals) ? vals : [vals || '—'];
+      vals.filter(function(v, i){ return vals.indexOf(v) === i; }).forEach(function(v){ if (!(v in counts)) { counts[v] = 0; order.push(v); } counts[v]++; });
+    });
+    (state.cf[fkey] || []).forEach(function(v){ if (!(v in counts)) { counts[v] = 0; order.push(v); } });
+    if (fkey === 'exp') order.sort(function(a, b){ return expRank(a) - expRank(b); });
+    else if (fkey === 'avail') order.sort(function(a, b){ return availNum(a) - availNum(b); });
+    else if (fkey === 'status' || fkey === 'hr') {
+      var pref = fkey === 'status' ? ['Chưa đánh giá'].concat(state.data.statuses) : ['Chưa xử lý'].concat(state.data.hrStatuses);
+      order.sort(function(a, b){ var x = pref.indexOf(a), y = pref.indexOf(b); return (x < 0 ? 99 : x) - (y < 0 ? 99 : y); });
+    }
+    else order.sort();
+    var sel = state.cf[fkey] || [];
+    return '<div class="cm-sec"><div class="cm-h">' + esc(title) + (sel.length ? '<button class="cm-link" data-cfclear="' + fkey + '">Bỏ chọn</button>' : '') + '</div>' +
+      '<div class="cm-list">' + (order.length ? order.map(function(v){
+        return '<label class="cm-check"><input type="checkbox" data-cf="' + fkey + '" value="' + esc(v) + '"' + (sel.indexOf(v) >= 0 ? ' checked' : '') + '><span>' + esc(v) + '</span><em>' + counts[v] + '</em></label>';
+      }).join('') : '<div class="cm-empty">Không có dữ liệu</div>') + '</div></div>';
+  }
+  if (col.list) html += checklist(col.key, 'Lọc theo giá trị', col.list);
+  if (col.groups) col.groups.forEach(function(g){ html += checklist(g[0], 'Lọc · ' + g[1], g[2]); });
+  if (col.range) {
+    var fmt = function(n){ return n == null ? '' : Number(n).toLocaleString('vi-VN'); };
+    html += '<div class="cm-sec"><div class="cm-h">Khoảng lương (VND)<button class="cm-link" data-cfclear="salary"' + (colActive(col) ? '' : ' hidden') + '>Bỏ lọc</button></div>' +
+      '<div class="cm-range"><input id="salMin" inputmode="numeric" placeholder="Từ" value="' + fmt(state.cf.salMin) + '"><span>–</span><input id="salMax" inputmode="numeric" placeholder="Đến" value="' + fmt(state.cf.salMax) + '"></div></div>';
+  }
+  m.innerHTML = '<div class="cm-body">' + html + '</div>';
+  m.querySelector('.cm-body').scrollTop = keepScroll;
+  positionMenu();
+}
+
+function positionMenu(){
+  var m = $('#colMenu'), b = $('.hcell[data-col="' + state.menu + '"]');
+  if (!m || !b) return;
+  var r = b.getBoundingClientRect(), w = Math.min(280, window.innerWidth - 24);
+  m.style.width = w + 'px';
+  m.style.left = Math.max(12, Math.min(r.left, window.innerWidth - w - 12)) + 'px';
+  m.style.top = (r.bottom + 6) + 'px';
+  m.style.maxHeight = Math.max(200, window.innerHeight - r.bottom - 24) + 'px';
+}
+window.addEventListener('scroll', function(){ if (state.menu) positionMenu(); }, true);
+
+/* ============================================================
+   Drawer
+   ============================================================ */
+function openDrawer(ref){
+  state.current = ref;
+  if (state.fresh[ref]) { delete state.fresh[ref]; var fb = $('.row[data-ref="' + ref + '"] .fresh'); if (fb) fb.remove(); }
+  var c = cand(ref);
+  state.draft = draftFrom(c);
+  var iv = ivParts(c.interview);
+  state.hrDraft = { hrStatus: c.hrStatus || '', date: iv.date, time: iv.time };
+  state.dp = null;
+  renderDrawer();
+  $('#drawer').classList.add('show'); $('#drawer').setAttribute('aria-hidden', 'false');
+  $('#backdrop').classList.add('show');
+  $$('.row[data-ref]').forEach(function(r){ r.classList.toggle('active', r.getAttribute('data-ref') === ref); });
+}
+function closeDrawer(){
+  state.current = null;
+  $('#drawer').classList.remove('show'); $('#drawer').setAttribute('aria-hidden', 'true');
+  $('#backdrop').classList.remove('show');
+  $$('.row.active').forEach(function(r){ r.classList.remove('active'); });
+}
+function draftFrom(c){ var r = myRev(c) || {}; return { status: r.status || '', comment: r.comment || '' }; }
+function dirtyReview(){
+  var c = cand(state.current), d = state.draft;
+  if (!c || !d || !canRev(c)) return false;
+  var r = draftFrom(c);
+  return r.status !== d.status || (r.comment || '') !== (d.comment || '');
+}
+function dirtyHr(){
+  var c = cand(state.current), h = state.hrDraft;
+  if (!c || !h || !state.data.me.isHr) return false;
+  var iv = ivParts(c.interview);
+  return (c.hrStatus || '') !== h.hrStatus || iv.date !== h.date || iv.time !== h.time;
+}
+function dirty(){ return dirtyReview() || dirtyHr(); }
+
+function renderDrawer(){
+  var c = cand(state.current); if (!c) return;
+  var oldBody = $('#drawer .d-body');
+  var keepTop = oldBody && state.renderedRef === c.ref ? oldBody.scrollTop : 0;   // same candidate → keep scroll position
+  var focusId = document.activeElement && document.activeElement.id;
+  var d = state.draft, list = filtered(), i = list.map(function(x){ return x.ref; }).indexOf(c.ref);
+  var me = state.data.me;
+  var ratingLbl = ['Chưa chấm điểm', 'Rất không phù hợp', 'Chưa phù hợp', 'Tạm được', 'Tốt', 'Rất tốt'][d.rating || 0];
+
+  $('#drawer').innerHTML =
+    '<div class="d-top">' +
+      '<span class="count">' + (i >= 0 ? (i + 1) + ' / ' + list.length : '') + '</span>' +
+      '<button class="navbtn" data-nav="-1" title="Ứng viên trước (phím ←)"' + (i <= 0 ? ' disabled' : '') + '>' + ICON.left + '<span>Trước</span></button>' +
+      '<button class="navbtn next" data-nav="1" title="Ứng viên sau (phím →)"' + (i < 0 || i >= list.length - 1 ? ' disabled' : '') + '><span>Sau</span>' + ICON.right + '</button>' +
+      '<button class="icon-btn" data-close aria-label="Đóng">' + ICON.x + '</button>' +
+    '</div>' +
+    '<div class="d-body">' +
+      (c.hidden ? '<div class="hid-banner">' + ICON.eyeOff + (c.expired
+          ? '<span>Tự ẩn vì đã quá 1 tháng kể từ ngày nộp — leader và HR không thấy. Dữ liệu vẫn còn trong Google Sheet.</span>'
+          : '<span>Hồ sơ đang bị ẩn — leader và HR không thấy.</span><button class="btn" data-unhide>Hiện lại</button>') + '</div>' : '') +
+      (c.hrStatus ? hrPill(c.hrStatus) : '') +
+      '<h2 class="d-name" style="margin-top:10px">' + esc(c.name) + '</h2>' +
+      '<p class="d-sub"><b>' + esc(c.position) + '</b> · ' + esc(c.dept || '—') + '</p>' +
+      '<p class="d-sub" style="font-size:12px">Nộp ' + esc(fmtDate(c.date)) + ' · Mã ' + esc(c.ref) + '</p>' +
+
+      '<div class="files">' +
+        '<button class="file-btn primary" data-view="cv"' + (c.hasCv ? '' : ' disabled') + '><span class="fi">' + ICON.doc + '</span><span><b>Xem CV</b><span>Mở ngay trong trang</span></span></button>' +
+        '<button class="file-btn" data-view="portfolio"' + (c.portfolio ? '' : ' disabled') + '><span class="fi">' + ICON.folder + '</span><span><b>Portfolio</b><span>' + (c.portfolio === 'link' ? 'Link ứng viên gửi' : c.portfolio ? 'File ứng viên gửi' : 'Không có') + '</span></span></button>' +
+      '</div>' +
+
+      '<div class="card"><h3>Thông tin</h3><div class="info">' +
+        '<div><label>Năm sinh</label><b>' + esc(c.yob || '—') + '</b></div>' +
+        '<div><label>Kinh nghiệm</label><b>' + esc(c.exp || '—') + '</b></div>' +
+        '<div><label>Mức lương</label><b>' + money(c.salary) + '</b></div>' +
+        '<div><label>Ngày bắt đầu</label><b>' + esc(c.avail || '—') + '</b></div>' +
+      '</div></div>' +
+
+      (c.message ? '<div class="card"><h3>Lời nhắn của ứng viên</h3><p class="msg">' + esc(c.message) + '</p></div>' : '') +
+
+      (me.isHr && (c.email || c.phone) ? '<div class="card"><h3>Liên hệ <span class="badge">CHỈ HR</span></h3><div class="contact">' +
+        (c.phone ? contactRow(ICON.phone, c.phone, 'Số điện thoại') : '') +
+        (c.email ? contactRow(ICON.mail, c.email, 'Email') : '') +
+      '</div></div>' : '') +
+
+      hrCard(c) +
+      othersCard(c) +
+
+      (canRev(c) ? '<div class="card"><h3>Đánh giá của bạn</h3>' +
+        '<div class="opts">' +
+          ['' ].concat(state.data.statuses).map(function(s){
+            return '<button class="opt ' + (d.status === s ? 'on ' + tone(s) : '') + '" data-status="' + esc(s) + '">' + esc(s || 'Chưa đánh giá') + '</button>';
+          }).join('') +
+        '</div>' +
+        '<textarea id="comment" placeholder="Nhận xét về ứng viên (HR sẽ thấy nhận xét này)">' + esc(d.comment || '') + '</textarea>' +
+        '<div class="save-row"><button class="btn btn-primary" id="saveBtn"' + (dirtyReview() ? '' : ' disabled') + '>Lưu đánh giá</button>' +
+          (myRev(c) ? '<span class="last">Bạn lưu lúc<br>' + esc(fmtDate(myRev(c).at)) + '</span>' : '<span class="last">Bạn chưa đánh giá hồ sơ này</span>') +
+        '</div>' +
+      '</div>' : '') +
+      (me.isAdmin ? '<div class="card admin"><h3>Quản trị <span class="badge">CHỈ ADMIN</span></h3>' +
+        '<p class="last" style="margin-bottom:12px">Ẩn hồ sơ khỏi trang này (ví dụ hồ sơ test). Dữ liệu trong Google Sheet vẫn giữ nguyên, có thể hiện lại bất cứ lúc nào.</p>' +
+        (c.expired ? '<p class="last">Hồ sơ đã quá 1 tháng nên tự ẩn khỏi trang.</p>'
+        : c.hidden ? '<button class="btn btn-danger" data-unhide>' + ICON.eye + 'Hiện lại hồ sơ</button>'
+                  : '<button class="btn btn-danger" data-hide>' + ICON.eyeOff + 'Ẩn hồ sơ khỏi trang leader</button>') +
+      '</div>' : '') +
+    '</div>';
+  state.renderedRef = c.ref;
+  var nb = $('#drawer .d-body'); if (nb) nb.scrollTop = keepTop;
+  if (focusId === 'comment') { var cm = $('#comment'); if (cm) { cm.focus({ preventScroll: true }); cm.setSelectionRange(cm.value.length, cm.value.length); } }
+}
+
+/* ---- Calendar popover ---- */
+var WD = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function iso(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function dayLabel(isoStr){
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoStr || ''); if (!m) return '';
+  var d = new Date(+m[1], +m[2] - 1, +m[3]);
+  return ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'][d.getDay()] + ', ' + m[3] + '/' + m[2] + '/' + m[1];
+}
+function dpHtml(selected){
+  var y = state.dp.y, mo = state.dp.m;
+  var first = new Date(y, mo, 1), start = (first.getDay() + 6) % 7;   // Monday-first
+  var today = iso(new Date());
+  var cells = '';
+  for (var i = 0; i < 42; i++) {
+    var d = new Date(y, mo, 1 - start + i), v = iso(d), dow = (d.getDay() + 6) % 7;
+    cells += '<button type="button" data-dp-pick="' + v + '" class="' +
+      (d.getMonth() !== mo ? 'out ' : '') + (dow >= 5 ? 'we ' : '') + (v === today ? 'today ' : '') + (v === selected ? 'sel' : '') + '">' + d.getDate() + '</button>';
+  }
+  return '<div class="dp" role="dialog" aria-label="Chọn ngày">' +
+    '<div class="dp-head"><button type="button" data-dp-nav="-1" aria-label="Tháng trước">' + ICON.up.replace('M6 15l6-6 6 6', 'M15 6l-6 6 6 6') + '</button>' +
+      '<b>Tháng ' + (mo + 1) + ', ' + y + '</b>' +
+      '<button type="button" data-dp-nav="1" aria-label="Tháng sau">' + ICON.up.replace('M6 15l6-6 6 6', 'M9 6l6 6-6 6') + '</button></div>' +
+    '<div class="dp-grid">' + WD.map(function(w){ return '<span class="wd">' + w + '</span>'; }).join('') + cells + '</div>' +
+    '<div class="dp-foot"><button type="button" data-dp-pick="' + today + '">Hôm nay</button><button type="button" data-dp-close>Đóng</button></div>' +
+  '</div>';
+}
+function openDp(){
+  var cur = /^(\d{4})-(\d{2})/.exec(state.hrDraft.date || '');
+  var now = new Date();
+  state.dp = cur ? { y: +cur[1], m: +cur[2] - 1 } : { y: now.getFullYear(), m: now.getMonth() };
+}
+
+/** Evaluations of the other leaders (everyone, for HR). */
+function othersCard(c){
+  var me = state.data.me.email, canReview = canRev(c);
+  var who = reviewerList(c).filter(function(e){ return !canReview || e !== me; });
+  if (!who.length) return canReview ? '' : '<div class="card"><h3>Đánh giá của leader</h3><p class="last">Chưa có leader nào phụ trách phòng ban này.</p></div>';
+  return '<div class="card"><h3>' + (canReview ? 'Leader khác đánh giá' : 'Đánh giá của leader') + '</h3><div class="rlist">' + who.map(function(e){
+    var r = (c.reviews || []).filter(function(x){ return x.by === e; })[0];
+    if (!r) return '<div class="ritem todo"><b>' + esc(shortName(e)) + '</b> · chưa đánh giá</div>';
+    return '<div class="ritem"><div class="rtop"><b>' + esc(shortName(e)) + '</b>' + (r.status ? pill(r.status).replace('class="pill ', 'class="pill sm ') : '') + starsSm(r.rating) + '</div>' +
+      (r.comment ? '<div class="c">' + esc(r.comment) + '</div>' : '') +
+      '<div class="t">' + esc(e) + ' · ' + esc(fmtDate(r.at)) + '</div></div>';
+  }).join('') + '</div></div>';
+}
+
+function contactRow(icon, value, label){
+  return '<div class="ct"><span class="ic">' + icon + '</span><span class="val">' + esc(value) + '</span>' +
+    '<button class="cp" data-copy="' + esc(value) + '" aria-label="Sao chép ' + esc(label) + '">' + ICON.copy + 'Sao chép</button></div>';
+}
+
+/** Copy that also works inside the Apps Script iframe (falls back to execCommand). */
+function copyText(text){
+  function legacy(){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'; ta.style.top = '0';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+    var ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+    ta.remove(); return ok ? Promise.resolve() : Promise.reject();
+  }
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).catch(legacy);
+  return legacy();
+}
+
+function hrCard(c){
+  var me = state.data.me, h = state.hrDraft;
+  if (!me.isHr) {
+    if (!c.hrStatus && !c.interview) return '';
+    return '<div class="card hr"><h3>HR</h3><div class="ro">' + (c.hrStatus ? '<div>' + hrPill(c.hrStatus) + '</div>' : '') +
+      (c.interview ? '<div><div class="k">Lịch phỏng vấn</div><div class="v">' + esc(c.interview) + '</div></div>' : '') + '</div></div>';
+  }
+  var needTime = h.hrStatus === 'Đã hẹn PV' && (!h.date || !h.time);
+  var half = (!!h.date) !== (!!h.time);
+  return '<div class="card hr"><h3>Xử lý của HR <span class="badge">CHỈ HR</span></h3>' +
+    '<div class="opts">' + [''].concat(state.data.hrStatuses).map(function(st){
+      return '<button class="opt ' + (h.hrStatus === st ? 'on ' + hrTone(st) : '') + '" data-hrstatus="' + esc(st) + '">' + esc(st || 'Chưa xử lý') + '</button>';
+    }).join('') + '</div>' +
+    '<div class="dt">' +
+      '<div class="dwrap"><label for="ivDate">Ngày phỏng vấn</label>' +
+        '<button type="button" id="ivDate" class="date-field' + (h.date ? '' : ' ph') + (state.dp ? ' open' : '') + '" data-dp-toggle>' +
+          '<span>' + (h.date ? esc(dayLabel(h.date)) : 'Chọn ngày') + '</span>' + ICON.cal + '</button>' +
+        (state.dp ? dpHtml(h.date) : '') +
+      '</div>' +
+      '<div><label for="ivTime">Giờ</label><select id="ivTime">' + timeOpts(h.time) + '</select></div>' +
+      (needTime ? '<span class="err">Chọn ngày và giờ phỏng vấn.</span>' : half ? '<span class="err">Cần chọn đủ cả ngày và giờ.</span>' : '') +
+    '</div>' +
+    '<div class="save-row"><button class="btn btn-hr" id="saveHrBtn"' + (dirtyHr() && !half && !needTime ? '' : ' disabled') + '>Lưu thông tin HR</button>' +
+      (h.date || h.time ? '<button class="btn" style="background:var(--soft)" data-cleariv>Xoá lịch</button>' : '') +
+    '</div>' +
+    '<div class="invite-row">' + (c.invite ? '<span class="mailtag" style="font-size:12px;padding:4px 10px">' + ICON.mail + 'Mail sent</span>' : '') +
+      '<button class="btn btn-invite' + (c.invite ? ' sent' : '') + '" data-invite' + (c.email && h.date && h.time && !half ? '' : ' disabled') + '>' + ICON.send + (c.invite ? 'Gửi lại thư mời' : 'Gửi thư mời PV') + '</button>' +
+      '<span class="last">' + (!c.email ? 'Ứng viên không có email.' : !(h.date && h.time) ? 'Chọn ngày và giờ phỏng vấn trước.' : c.invite ? 'Đã gửi thư mời: ' + esc(c.invite) : 'Email gửi từ ' + esc((state.data.invite || {}).from || 'hr@insidegroup.co.kr')) + '</span></div>' +
+    (h.hrStatus === 'Gửi offer' || c.offer
+      ? '<div class="invite-row">' + (c.offer ? '<span class="mailtag offer" style="font-size:12px;padding:4px 10px">' + ICON.mail + 'Offer sent</span>' : '') +
+        '<button class="btn btn-offer' + (c.offer ? ' sent' : '') + '" data-offer' + (c.email ? '' : ' disabled') + '>' + ICON.send + (c.offer ? 'Gửi lại offer letter' : 'Gửi offer letter') + '</button>' +
+        '<span class="last">' + (!c.email ? 'Ứng viên không có email.' : c.offer ? 'Đã gửi offer: ' + esc(c.offer) : 'Email gửi từ ' + esc((state.data.invite || {}).from || 'hr@insidegroup.co.kr')) + '</span></div>'
+      : '') +
+    '</div>';
+}
+
+/* ---- Interview invitation modal (HR) ---- */
+function openInvite(){
+  var c = cand(state.current); if (!c) return;
+  keepComment();
+  state.inv = { ref: c.ref, mode: 'offline', link: '', people: [], other: '', step: 'form', err: '', preview: null, sending: false };
+  renderInvite();
+  $('#invWrap').classList.add('show'); $('#invWrap').setAttribute('aria-hidden', 'false');
+}
+function closeInvite(){ state.inv = null; $('#invWrap').classList.remove('show'); $('#invWrap').setAttribute('aria-hidden', 'true'); }
+function invPayload(){
+  var v = state.inv, h = state.hrDraft;
+  var people = v.people.slice();
+  v.other.split(/[\n,;]/).map(function(x){ return x.trim(); }).filter(Boolean).forEach(function(x){ people.push(x); });
+  return { mode: v.mode, date: h.date, time: h.time, link: v.link.trim(), interviewers: people };
+}
+function invValidate(p){
+  if (p.mode === 'online' && !/^https?:\/\/\S+$/i.test(p.link)) return 'Vui lòng dán link Google Meet (bắt đầu bằng https://).';
+  if (!p.interviewers.length) return 'Chọn ít nhất 1 người phỏng vấn.';
+  return '';
+}
+function renderInvite(){
+  var v = state.inv; if (!v) return;
+  if (v.kind === 'offer') return renderOffer();
+  var c = cand(v.ref), cfg = state.data.invite || { interviewers: [] }, h = state.hrDraft;
+  var head = '<div class="inv-h"><div><h2>Gửi thư mời phỏng vấn</h2><p>' + esc(c.name) + ' · ' + esc(c.position) + '</p></div><button class="icon-btn" data-invclose aria-label="Đóng">' + ICON.x + '</button></div>';
+  if (v.step === 'preview' && v.preview) {
+    $('#inv').innerHTML = head +
+      '<div class="inv-b"><div class="inv-prev"><div class="sub"><b>Tới:</b> ' + esc(v.preview.to) + ' &nbsp;·&nbsp; <b>Từ:</b> ' + esc(v.preview.from) + '<br><b>Tiêu đề:</b> ' + esc(v.preview.subject) + '</div>' +
+      '<div class="mailbox" role="document" aria-label="Xem trước email"></div></div>' + (v.err ? '<div class="inv-err">' + esc(v.err) + '</div>' : '') + '</div>' +
+      '<div class="inv-f-row"><button class="btn" style="background:var(--soft)" data-invback' + (v.sending ? ' disabled' : '') + '>Quay lại sửa</button>' +
+      '<button class="btn btn-invite" data-invsend' + (v.sending ? ' disabled' : '') + '>' + (v.sending ? '<span class="spinner"></span>Đang gửi…' : ICON.send + 'Gửi email') + '</button></div>';
+    showMail($('#inv .mailbox'), v.preview.html);
+    return;
+  }
+  var all = cfg.interviewers.slice();
+  $('#inv').innerHTML = head +
+    '<div class="inv-b">' +
+      (c.invite ? '<div class="inv-warn">Ứng viên đã được gửi thư mời (' + esc(c.invite) + '). Gửi lại sẽ gửi thêm một email mới.</div>' : '') +
+      '<div class="inv-meta"><span>Tới</span><b>' + esc(c.email || '—') + '</b><span>Từ</span><b>' + esc(cfg.from || 'hr@insidegroup.co.kr') + '</b>' +
+        '<span>Thời gian</span><b>' + esc(dayLabel(h.date)) + ' · ' + esc(h.time) + ' <span class="last">(đổi ở mục HR)</span></b></div>' +
+      '<div class="inv-f"><label class="t">Hình thức</label><div class="seg2">' +
+        '<button type="button" data-invmode="offline" class="' + (v.mode === 'offline' ? 'on' : '') + '">' + ICON.building + 'Offline tại văn phòng</button>' +
+        '<button type="button" data-invmode="online" class="' + (v.mode === 'online' ? 'on' : '') + '">' + ICON.video + 'Online (Google Meet)</button></div></div>' +
+      (v.mode === 'online'
+        ? '<div class="inv-f"><label class="t" for="invLink">Link Google Meet</label><input type="url" id="invLink" placeholder="https://meet.google.com/xxx-xxxx-xxx" value="' + esc(v.link) + '"></div>'
+        : '<div class="inv-f"><label class="t">Địa điểm (tự điền vào email)</label><div class="inv-info"><b>' + esc(cfg.company || '') + '</b><br>' + esc(cfg.address || '') + '<br><span class="last">Khi đến liên hệ: <b>' + esc(cfg.contact || '') + '</b></span></div></div>') +
+      '<div class="inv-f"><label class="t">Người phỏng vấn</label><div class="inv-people">' + all.map(function(p){
+        var on = v.people.indexOf(p) >= 0;
+        return '<label class="' + (on ? 'on' : '') + '"><input type="checkbox" data-invp value="' + esc(p) + '"' + (on ? ' checked' : '') + '><span>' + esc(p) + '</span></label>';
+      }).join('') + '</div>' +
+      '<input type="text" id="invOther" style="margin-top:8px" placeholder="Người khác (nếu có) — ví dụ: Ms. Lan - HR Executive" value="' + esc(v.other) + '"></div>' +
+      (v.err ? '<div class="inv-err">' + esc(v.err) + '</div>' : '') +
+    '</div>' +
+    '<div class="inv-f-row"><button class="btn" style="background:var(--soft)" data-invclose>Huỷ</button><button class="btn btn-hr" data-invpreview>Xem trước email</button></div>';
+}
+/** Email preview is always shown light: dark-mode browsers would otherwise repaint it as white-on-black. */
+function showMail(box, html){
+  // Rendered in a shadow root (not an iframe) so it inherits this page's forced light scheme and the page styles can't leak in.
+  var root = box.shadowRoot || box.attachShadow({ mode: 'open' });
+  root.innerHTML = '<style>:host{display:block;color-scheme:only light;background:#fff!important;color:#222!important}.m{padding:16px 22px}a{color:#1a56c4}</style><div class="m">' + html + '</div>';
+}
+/* ---- Offer letter modal (HR) ---- */
+function isoFromDmy(s){ var m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(String(s || '').trim()); return m ? m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2) : ''; }
+function openOffer(){
+  var c = cand(state.current); if (!c) return;
+  keepComment();
+  var sal = String(c.salary || '').replace(/\D/g, '');
+  state.inv = { kind: 'offer', ref: c.ref, position: c.position || '', start: isoFromDmy(c.avail), salary: sal ? Number(sal).toLocaleString('vi-VN') : '', step: 'form', err: '', preview: null, sending: false };
+  renderInvite();
+  $('#invWrap').classList.add('show'); $('#invWrap').setAttribute('aria-hidden', 'false');
+}
+function ofPayload(){ var v = state.inv; return { position: v.position.trim(), start: v.start, salary: v.salary.replace(/\D/g, '') }; }
+function ofValidate(p){
+  if (!p.position) return 'Nhập vị trí.';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(p.start)) return 'Chọn ngày bắt đầu làm việc.';
+  if (!p.salary || !+p.salary) return 'Nhập mức lương.';
+  return '';
+}
+function renderOffer(){
+  var v = state.inv, c = cand(v.ref), cfg = state.data.invite || {}, o = cfg.offer || {};
+  var head = '<div class="inv-h"><div><h2>Gửi offer letter</h2><p>' + esc(c.name) + ' · ' + esc(c.position) + '</p></div><button class="icon-btn" data-invclose aria-label="Đóng">' + ICON.x + '</button></div>';
+  if (v.step === 'preview' && v.preview) {
+    $('#inv').innerHTML = head +
+      '<div class="inv-b"><div class="inv-prev"><div class="sub"><b>Tới:</b> ' + esc(v.preview.to) + ' &nbsp;·&nbsp; <b>Từ:</b> ' + esc(v.preview.from) + '<br><b>Tiêu đề:</b> ' + esc(v.preview.subject) + '</div>' +
+      '<div class="mailbox" role="document" aria-label="Xem trước email"></div></div>' + (v.err ? '<div class="inv-err">' + esc(v.err) + '</div>' : '') + '</div>' +
+      '<div class="inv-f-row"><button class="btn" style="background:var(--soft)" data-invback' + (v.sending ? ' disabled' : '') + '>Quay lại sửa</button>' +
+      '<button class="btn btn-offer" data-ofsend' + (v.sending ? ' disabled' : '') + '>' + (v.sending ? '<span class="spinner"></span>Đang gửi…' : ICON.send + 'Gửi offer') + '</button></div>';
+    showMail($('#inv .mailbox'), v.preview.html);
+    return;
+  }
+  $('#inv').innerHTML = head +
+    '<div class="inv-b">' +
+      (c.offer ? '<div class="inv-warn">Ứng viên đã được gửi offer (' + esc(c.offer) + '). Gửi lại sẽ gửi thêm một email mới.</div>' : '') +
+      '<div class="inv-meta"><span>Tới</span><b>' + esc(c.email || '—') + '</b><span>Từ</span><b>' + esc(cfg.from || 'hr@insidegroup.co.kr') + '</b></div>' +
+      '<div class="of-grid">' +
+        '<div class="inv-f full"><label class="t" for="ofPos">Vị trí</label><input type="text" id="ofPos" value="' + esc(v.position) + '" placeholder="Ví dụ: E-commerce Executive"></div>' +
+        '<div class="inv-f"><label class="t" for="ofDate">Ngày bắt đầu làm việc</label><input type="date" id="ofDate" value="' + esc(v.start) + '"></div>' +
+        '<div class="inv-f"><label class="t" for="ofSal">Mức lương chính thức</label><div class="of-sal"><input type="text" id="ofSal" inputmode="numeric" value="' + esc(v.salary) + '" placeholder="13.000.000"><span>VNĐ/tháng (gross)</span></div></div>' +
+      '</div>' +
+      '<div class="inv-f"><label class="t">Giữ nguyên trong email</label><div class="inv-info">' +
+        '<b>Thời gian làm việc:</b> ' + esc(o.hours || '') + '<br><b>Thời gian thử việc:</b> ' + esc(o.probation || '') +
+        '<br><b>Địa điểm:</b> ' + esc(o.company || '') + ', ' + esc(o.address || '') + '</div></div>' +
+      (v.err ? '<div class="inv-err">' + esc(v.err) + '</div>' : '') +
+    '</div>' +
+    '<div class="inv-f-row"><button class="btn" style="background:var(--soft)" data-invclose>Huỷ</button><button class="btn btn-hr" data-ofpreview>Xem trước email</button></div>';
+}
+function ofPreview(){
+  var v = state.inv, p = ofPayload(), err = ofValidate(p);
+  if (err) { v.err = err; renderInvite(); return; }
+  v.err = ''; var btn = $('[data-ofpreview]'); if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Đang tạo…'; }
+  call('previewOffer', [v.ref, p]).then(function(res){ if (!state.inv) return; v.preview = res; v.step = 'preview'; renderInvite(); })
+    .catch(function(e){ if (!state.inv) return; v.err = errMsg(e); renderInvite(); });
+}
+function ofSend(){
+  var v = state.inv; if (!v || v.sending) return;
+  v.sending = true; v.err = ''; renderInvite();
+  call('sendOffer', [v.ref, ofPayload()]).then(function(res){
+    var c = cand(v.ref); Object.assign(c, { hrStatus: res.hrStatus, offer: res.offer });
+    if (state.current === v.ref) state.hrDraft.hrStatus = res.hrStatus;
+    closeInvite(); refreshParts(); if (state.current) renderDrawer();
+    toast('Đã gửi offer letter tới ' + res.to);
+  }).catch(function(e){ if (!state.inv) return; v.sending = false; v.err = errMsg(e); renderInvite(); });
+}
+function invPreview(){
+  var v = state.inv, p = invPayload(), err = invValidate(p);
+  if (err) { v.err = err; renderInvite(); return; }
+  v.err = ''; var btn = $('[data-invpreview]'); if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Đang tạo…'; }
+  call('previewInvite', [v.ref, p]).then(function(res){ if (!state.inv) return; v.preview = res; v.step = 'preview'; renderInvite(); })
+    .catch(function(e){ if (!state.inv) return; v.err = errMsg(e); renderInvite(); });
+}
+function invSend(){
+  var v = state.inv; if (!v || v.sending) return;
+  v.sending = true; v.err = ''; renderInvite();
+  call('sendInvite', [v.ref, invPayload()]).then(function(res){
+    var c = cand(v.ref); Object.assign(c, { hrStatus: res.hrStatus, interview: res.interview, invite: res.invite });
+    if (state.current === v.ref) { var iv = ivParts(res.interview); state.hrDraft = { hrStatus: res.hrStatus, date: iv.date, time: iv.time }; }
+    closeInvite(); refreshParts(); if (state.current) renderDrawer();
+    toast('Đã gửi thư mời tới ' + res.to);
+  }).catch(function(e){ if (!state.inv) return; v.sending = false; v.err = errMsg(e); renderInvite(); });
+}
+
+function updateSaveBtn(){ var b = $('#saveBtn'); if (b && !state.saving) b.disabled = !dirtyReview(); }
+
+function keepComment(){ var cm = $('#comment'); if (cm && state.draft) state.draft.comment = cm.value; }
+
+function saveHr(){
+  if (!dirtyHr() || state.saving) return;
+  var ref = state.current, h = state.hrDraft, btn = $('#saveHrBtn');
+  if ((!!h.date) !== (!!h.time) || (h.hrStatus === 'Đã hẹn PV' && (!h.date || !h.time))) return;
+  keepComment();
+  state.saving = true; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Đang lưu…';
+  call('saveHr', [ref, h.hrStatus, h.date, h.time]).then(function(res){
+    state.saving = false;
+    Object.assign(cand(ref), res);
+    var iv = ivParts(res.interview);
+    state.hrDraft = { hrStatus: res.hrStatus, date: iv.date, time: iv.time };
+    toast('Đã lưu thông tin HR');
+    refreshParts();
+    if (state.current === ref) renderDrawer();
+  }).catch(function(e){
+    state.saving = false; toast(errMsg(e), true);
+    if (state.current === ref) renderDrawer();
+  });
+}
+
+function save(){
+  if (!dirtyReview() || state.saving) return;
+  var ref = state.current, d = state.draft, btn = $('#saveBtn');
+  state.saving = true; btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Đang lưu…';
+  call('saveReview', [ref, d.status, 0, d.comment || '']).then(function(res){
+    state.saving = false;
+    cand(ref).reviews = res.reviews;
+    state.draft = draftFrom(cand(ref));
+    toast('Đã lưu đánh giá');
+    refreshParts();
+    if (state.current === ref) renderDrawer();
+  }).catch(function(e){
+    state.saving = false; toast(errMsg(e), true);
+    if (state.current === ref) renderDrawer();
+  });
+}
+
+function setHiddenUI(ref, hide){
+  var c = cand(ref); if (!c) return;
+  if (hide && !confirm('Ẩn hồ sơ "' + c.name + '" khỏi trang leader?\nDữ liệu trong Google Sheet vẫn giữ nguyên.')) return;
+  call('setHidden', [ref, hide]).then(function(res){
+    c.hidden = res.hidden;
+    if (hide && !state.showHidden) closeDrawer(); else if (state.current === ref) renderDrawer();
+    refreshParts();
+    toast(hide ? 'Đã ẩn hồ sơ ' + c.name : 'Đã hiện lại hồ sơ ' + c.name, false, hide ? { label: 'Hoàn tác', fn: function(){ setHiddenUI(ref, false); } } : null);
+  }).catch(function(e){ toast(errMsg(e), true); });
+}
+
+function nav(step){
+  if (dirty() && !confirm('Đánh giá chưa được lưu. Bỏ qua thay đổi?')) return;
+  var list = filtered(), i = list.map(function(x){ return x.ref; }).indexOf(state.current);
+  var next = list[i + step]; if (next) { openDrawer(next.ref); return true; }
+  return false;
+}
+/** Next / previous candidate while the CV viewer is open: switch candidate and open the same kind of file. */
+function viewerNav(step){
+  var kind = V.kind || 'cv';
+  if (!nav(step)) return;
+  var c = cand(state.current);
+  if (kind === 'portfolio' && c && !c.portfolio) kind = 'cv';
+  if (c && kind === 'cv' && !c.hasCv) { V.token++; V.kind = kind; $('#vName').textContent = 'CV — ' + c.name; $('#vSub').textContent = c.position; $('#vDownload').hidden = true; showPdfTools(false); vState('<span>Ứng viên này không gửi CV.</span>');
+    var list = filtered(), i = list.map(function(x){ return x.ref; }).indexOf(c.ref);
+    $('#vPrev').disabled = i <= 0; $('#vNext').disabled = i < 0 || i >= list.length - 1; $('#vCount').textContent = (i + 1) + ' / ' + list.length; return; }
+  openViewer(kind);
+}
+function tryClose(){
+  if (dirty() && !confirm('Đánh giá chưa được lưu. Đóng mà không lưu?')) return;
+  closeDrawer();
+}
+
+/* ============================================================
+   File viewer (popup — never opens a new tab)
+   ============================================================ */
+var V = { token: 0, pdf: null, zoom: 1, file: null };
+
+function loadPdfJs(){
+  if (loadPdfJs.p) return loadPdfJs.p;
+  loadPdfJs.p = new Promise(function(resolve, reject){
+    var s = document.createElement('script');
+    s.src = PDFJS + 'pdf.min.js';
+    s.onload = function(){
+      var lib = window.pdfjsLib; if (!lib) return reject(new Error('pdfjs'));
+      fetch(PDFJS + 'pdf.worker.min.js').then(function(r){ return r.text(); }).then(function(code){
+        lib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
+        resolve(lib);
+      }).catch(function(){ lib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js'; resolve(lib); });
+    };
+    s.onerror = function(){ loadPdfJs.p = null; reject(new Error('pdfjs')); };
+    document.head.appendChild(s);
+  });
+  return loadPdfJs.p;
+}
+
+function b64ToBytes(b64){ var bin = atob(b64), out = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; }
+
+function vState(html){ $('#vPages').innerHTML = ''; var old = $('#vBody .v-state'); if (old) old.remove(); var n = $('#vNote'); if (n) n.remove(); var f = $('#vBody .v-frame'); if (f) f.remove(); if (html) $('#vBody').insertAdjacentHTML('beforeend', '<div class="v-state">' + html + '</div>'); }
+function showPdfTools(on){ $$('.v-pdf').forEach(function(b){ b.hidden = !on; }); $('#vZoomLbl').textContent = on ? Math.round(V.zoom * 100) + '%' : ''; }
+
+function openViewer(kind){
+  var c = cand(state.current); if (!c) return;
+  var token = ++V.token;
+  V.pdf = null; V.zoom = 1; V.file = null; V.kind = kind;
+  var list = filtered(), i = list.map(function(x){ return x.ref; }).indexOf(c.ref);
+  $('#vPrev').disabled = i <= 0; $('#vNext').disabled = i < 0 || i >= list.length - 1;
+  $('#vCount').textContent = i >= 0 ? (i + 1) + ' / ' + list.length : '';
+  $('#vName').textContent = (kind === 'cv' ? 'CV' : 'Portfolio') + ' — ' + c.name;
+  $('#vSub').textContent = c.position;
+  $('#vDownload').hidden = true; showPdfTools(false);
+  vState('<span class="spinner dark"></span><span>Đang tải ' + (kind === 'cv' ? 'CV' : 'portfolio') + '…</span>');
+  $('#viewer').classList.add('show'); $('#viewer').setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+
+  call('getFile', [c.ref, kind]).then(function(f){
+    if (token !== V.token) return;
+    V.file = f;
+    if (f.type === 'link') return showLink(f.url);
+    $('#vName').textContent = f.name || $('#vName').textContent;
+    $('#vDownload').hidden = false;
+    if (f.type === 'image') { vState(''); $('#vPages').innerHTML = '<img alt="" src="data:' + esc(f.mime) + ';base64,' + f.data + '">'; return; }
+    if (f.type !== 'pdf') { vState('<span>File này không xem trước được trên web.</span><button class="btn" data-dl>' + ICON.dl + 'Tải file về</button>'); return; }
+    loadPdfJs().then(function(lib){ return lib.getDocument({ data: b64ToBytes(f.data) }).promise; }).then(function(pdf){
+      if (token !== V.token) return;
+      V.pdf = pdf; vState(''); showPdfTools(true); drawPages(token);
+    }).catch(function(){
+      if (token !== V.token) return;
+      vState('<span>Không hiển thị được file này.</span><button class="btn" data-dl>' + ICON.dl + 'Tải file về</button>');
+    });
+  }).catch(function(e){ if (token === V.token) vState('<span>' + esc(errMsg(e)) + '</span>'); });
+}
+
+function drawPages(token){
+  var host = $('#vPages'), pdf = V.pdf; if (!pdf) return;
+  host.innerHTML = '';
+  var dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  var target = Math.min($('#vBody').clientWidth - 32, 880) * V.zoom;
+  var n = 1;
+  (function next(){
+    if (token !== V.token || n > pdf.numPages) return;
+    pdf.getPage(n).then(function(page){
+      if (token !== V.token) return;
+      var base = page.getViewport({ scale: 1 });
+      var vp = page.getViewport({ scale: (target / base.width) * dpr });
+      var cv = document.createElement('canvas');
+      cv.width = Math.floor(vp.width); cv.height = Math.floor(vp.height);
+      cv.style.width = Math.floor(vp.width / dpr) + 'px'; cv.style.height = Math.floor(vp.height / dpr) + 'px';
+      host.appendChild(cv);
+      return page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+    }).then(function(){ n++; next(); });
+  })();
+}
+
+function showLink(url){
+  var m = String(url).match(/(?:drive|docs)\.google\.com\/(?:file\/d\/|open\?id=|(document|presentation|spreadsheets)\/d\/)([\w-]{20,})/);
+  var src = url;
+  if (m) src = m[1] ? 'https://docs.google.com/' + m[1] + '/d/' + m[2] + '/preview' : 'https://drive.google.com/file/d/' + m[2] + '/preview';
+  if (!/^https?:\/\//i.test(src)) src = 'https://' + src;
+  vState('');
+  $('#vBody').insertAdjacentHTML('beforeend', '<iframe class="v-frame" src="' + esc(src) + '" referrerpolicy="no-referrer" allowfullscreen></iframe>');
+  $('#viewer .v-top').insertAdjacentHTML('afterend', '<div class="v-note" id="vNote"><span>Link ứng viên gửi: ' + esc(url) + '. Một số website (Behance, Canva…) chặn xem trực tiếp, nếu trang trắng hãy</span><a href="' + esc(/^https?:/i.test(url) ? url : 'https://' + url) + '" target="_blank" rel="noopener">mở trong tab mới ' + ICON.ext + '</a></div>');
+}
+
+function closeViewer(){
+  V.token++; V.pdf = null; V.file = null;
+  $('#viewer').classList.remove('show'); $('#viewer').setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  setTimeout(function(){ if (!$('#viewer').classList.contains('show')) vState(''); }, 200);
+}
+
+function download(){
+  var f = V.file; if (!f || !f.data) return;
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([b64ToBytes(f.data)], { type: f.mime || 'application/octet-stream' }));
+  a.download = f.name || 'file'; document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+}
+
+/* ============================================================
+   Events
+   ============================================================ */
+document.addEventListener('click', function(e){
+  var el;
+  if ((el = e.target.closest('[data-ref]'))) { if (state.current !== el.getAttribute('data-ref') && dirty() && !confirm('Đánh giá chưa được lưu. Bỏ qua thay đổi?')) return; openDrawer(el.getAttribute('data-ref')); return; }
+  if (state.menu && !e.target.closest('#colMenu') && !e.target.closest('[data-col]')) { closeMenu(); }
+  if ((el = e.target.closest('[data-col]'))) { openMenu(el.getAttribute('data-col')); return; }
+  if ((el = e.target.closest('[data-sort]'))) { var sp = el.getAttribute('data-sort').split(':'); state.sort = { by: sp[0], dir: sp[1] }; renderList(); renderMenu(); return; }
+  if ((el = e.target.closest('[data-cfclear]'))) { var k = el.getAttribute('data-cfclear'); if (k === 'salary') { delete state.cf.salMin; delete state.cf.salMax; } else delete state.cf[k]; refreshParts(); renderMenu(); return; }
+  if (e.target.closest('[data-clearcf]')) { state.cf = {}; closeMenu(); refreshParts(); return; }
+  if (e.target.closest('[data-showhidden]')) { state.showHidden = !state.showHidden; state.filter = 'all'; refreshParts(); return; }
+  if (e.target.closest('[data-hide]')) { setHiddenUI(state.current, true); return; }
+  if (e.target.closest('[data-unhide]')) { setHiddenUI(state.current, false); return; }
+  if ((el = e.target.closest('[data-filter]'))) { state.filter = el.getAttribute('data-filter'); state.showHidden = false; refreshParts(); return; }
+  if (e.target.closest('[data-close]') || e.target.id === 'backdrop') { tryClose(); return; }
+  if (e.target.closest('[data-lg-login]')) { doLogin(); return; }
+  if (e.target.closest('[data-lg-create]')) { doCreate(); return; }
+  if (e.target.closest('[data-lg-forgot]')) { doForgot(); return; }
+  if (e.target.closest('[data-lg-retry]')) { renderLogin(); return; }
+  if (e.target.closest('[data-logout]')) { logout(); return; }
+  if (e.target.closest('[data-accounts]')) { openAccounts(); return; }
+  if (e.target.closest('[data-accclose]') || e.target.id === 'accWrap') { closeAccounts(); return; }
+  if ((el = e.target.closest('[data-accreset]'))) { accReset(el); return; }
+  if ((el = e.target.closest('[data-vnav]'))) { if (!el.disabled) viewerNav(+el.getAttribute('data-vnav')); return; }
+  if ((el = e.target.closest('[data-nav]'))) { if (!el.disabled) nav(+el.getAttribute('data-nav')); return; }
+  if ((el = e.target.closest('[data-view]'))) { openViewer(el.getAttribute('data-view')); return; }
+  if ((el = e.target.closest('[data-status]'))) { keepComment(); state.draft.status = el.getAttribute('data-status'); renderDrawer(); return; }
+  if ((el = e.target.closest('[data-rate]'))) { keepComment(); var r = +el.getAttribute('data-rate'); state.draft.rating = state.draft.rating === r ? 0 : r; renderDrawer(); return; }
+  if (e.target.closest('[data-dp-toggle]')) { keepComment(); if (state.dp) state.dp = null; else openDp(); renderDrawer(); return; }
+  if ((el = e.target.closest('[data-dp-nav]'))) { var nm = state.dp.m + (+el.getAttribute('data-dp-nav')); state.dp = { y: state.dp.y + Math.floor(nm / 12), m: (nm % 12 + 12) % 12 }; renderDrawer(); return; }
+  if ((el = e.target.closest('[data-dp-pick]'))) {
+    keepComment(); state.hrDraft.date = el.getAttribute('data-dp-pick'); state.dp = null;
+    if (state.hrDraft.date && state.hrDraft.time && !state.hrDraft.hrStatus) state.hrDraft.hrStatus = 'Đã hẹn PV';
+    renderDrawer(); return;
+  }
+  if (e.target.closest('[data-dp-close]') || (state.dp && !e.target.closest('.dp'))) { state.dp = null; keepComment(); renderDrawer(); if (!e.target.closest('#drawer')) return; }
+  if ((el = e.target.closest('[data-hrstatus]'))) { keepComment(); state.hrDraft.hrStatus = el.getAttribute('data-hrstatus'); renderDrawer(); return; }
+  if (e.target.closest('[data-cleariv]')) { keepComment(); state.hrDraft.date = ''; state.hrDraft.time = ''; state.dp = null; renderDrawer(); return; }
+  if (e.target.closest('[data-invite]')) { openInvite(); return; }
+  if (e.target.closest('[data-offer]')) { openOffer(); return; }
+  if (e.target.closest('[data-ofpreview]')) { ofPreview(); return; }
+  if (e.target.closest('[data-ofsend]')) { ofSend(); return; }
+  if (e.target.closest('[data-invclose]') || e.target.id === 'invWrap') { if (state.inv && !state.inv.sending) closeInvite(); return; }
+  if ((el = e.target.closest('[data-invmode]'))) { state.inv.mode = el.getAttribute('data-invmode'); state.inv.err = ''; renderInvite(); return; }
+  if (e.target.closest('[data-invpreview]')) { invPreview(); return; }
+  if (e.target.closest('[data-invback]')) { state.inv.step = 'form'; state.inv.err = ''; renderInvite(); return; }
+  if (e.target.closest('[data-invsend]')) { invSend(); return; }
+  if ((el = e.target.closest('[data-copy]'))) {
+    var btn = el;
+    copyText(btn.getAttribute('data-copy')).then(function(){
+      btn.classList.add('done'); btn.innerHTML = ICON.check + 'Đã chép';
+      setTimeout(function(){ btn.classList.remove('done'); btn.innerHTML = ICON.copy + 'Sao chép'; }, 1600);
+    }, function(){ toast('Không sao chép được, hãy bôi đen để copy', true); });
+    return;
+  }
+  if (e.target.closest('#saveBtn')) { save(); return; }
+  if (e.target.closest('#saveHrBtn')) { saveHr(); return; }
+  if ((el = e.target.closest('[data-demo]'))) { DEMO.me = DEMO_ME[el.getAttribute('data-demo')]; $$('[data-demo]').forEach(function(b){ b.classList.toggle('on', b === el); }); closeDrawer(); closeMenu(); state.showHidden = false; state.data = null; load(); return; }
+  if (e.target.closest('#refresh')) { clearTimeout(live.timer); load(true); return; }
+  if (e.target.closest('#vClose')) { closeViewer(); return; }
+  if (e.target.closest('#vDownload') || e.target.closest('[data-dl]')) { download(); return; }
+  if ((el = e.target.closest('[data-zoom]'))) { V.zoom = Math.max(.5, Math.min(2.5, V.zoom + (+el.getAttribute('data-zoom')) * .25)); showPdfTools(true); drawPages(V.token); return; }
+  if (e.target.id === 'vBody' || e.target.classList.contains('v-pages')) { closeViewer(); return; }
+});
+document.addEventListener('input', function(e){
+  if (e.target.id === 'q') { state.q = e.target.value; renderList(); }
+  if (e.target.id === 'comment') { state.draft.comment = e.target.value; updateSaveBtn(); }
+  if (e.target.id === 'invLink' && state.inv) state.inv.link = e.target.value;
+  if (e.target.id === 'invOther' && state.inv) state.inv.other = e.target.value;
+  if (e.target.id === 'ofPos' && state.inv) state.inv.position = e.target.value;
+  if (e.target.id === 'ofDate' && state.inv) state.inv.start = e.target.value;
+  if (e.target.id === 'ofSal' && state.inv) {
+    var sd = e.target.value.replace(/\D/g, '').slice(0, 12);
+    e.target.value = sd ? Number(sd).toLocaleString('vi-VN') : ''; state.inv.salary = e.target.value;
+  }
+  if (e.target.id === 'salMin' || e.target.id === 'salMax') {
+    var digits = e.target.value.replace(/\D/g, '').slice(0, 12);
+    e.target.value = digits ? Number(digits).toLocaleString('vi-VN') : '';
+    if (digits) state.cf[e.target.id] = +digits; else delete state.cf[e.target.id];
+    var clr = $('#colMenu [data-cfclear="salary"]'); if (clr) clr.hidden = state.cf.salMin == null && state.cf.salMax == null;
+    clearTimeout(state._salT); state._salT = setTimeout(function(){ refreshParts(); positionMenu(); }, 250);
+  }
+});
+document.addEventListener('change', function(e){
+  if (e.target.matches && e.target.matches('[data-invp]') && state.inv) {
+    var pv = e.target.value, arr2 = state.inv.people, k2 = arr2.indexOf(pv);
+    if (e.target.checked && k2 < 0) arr2.push(pv); if (!e.target.checked && k2 >= 0) arr2.splice(k2, 1);
+    state.inv.err = ''; e.target.closest('label').classList.toggle('on', e.target.checked);
+    var ie = $('#inv .inv-err'); if (ie) ie.remove();
+  }
+  if (e.target.matches && e.target.matches('[data-cf]')) {
+    var key = e.target.getAttribute('data-cf'), arr = (state.cf[key] || []).slice(), v = e.target.value, i = arr.indexOf(v);
+    if (e.target.checked && i < 0) arr.push(v); if (!e.target.checked && i >= 0) arr.splice(i, 1);
+    if (arr.length) state.cf[key] = arr; else delete state.cf[key];
+    refreshParts(); renderMenu();
+  }
+  if (e.target.id === 'ivTime') {
+    keepComment();
+    state.hrDraft.time = e.target.value;
+    if (state.hrDraft.date && state.hrDraft.time && !state.hrDraft.hrStatus) state.hrDraft.hrStatus = 'Đã hẹn PV';
+    renderDrawer();
+  }
+});
+document.addEventListener('change', function(e){
+  if (e.target.id === 'lgAcct') { state.lgAcct = e.target.value; drawLogin(); }
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Enter' && state.authShown && e.target.closest && e.target.closest('#lgBox') && e.target.tagName === 'INPUT') { e.preventDefault(); if ($('[data-lg-login]')) doLogin(); else if ($('[data-lg-create]')) doCreate(); return; }
+  if (e.key === 'Escape' && $('#accWrap').classList.contains('show')) { closeAccounts(); return; }
+  if (e.key === 'Escape' && state.inv) { if (!state.inv.sending) closeInvite(); return; }
+  if (e.key === 'Escape' && state.menu) { closeMenu(); return; }
+  if (e.key === 'Escape') { if ($('#viewer').classList.contains('show')) closeViewer(); else if (state.dp) { state.dp = null; renderDrawer(); } else if (state.current) tryClose(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && state.current) save();
+  if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && state.current && !state.inv && !state.menu && !state.dp && !e.altKey && !e.ctrlKey && !e.metaKey) {
+    var t = e.target, tag = (t && t.tagName) || '';
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (t && t.isContentEditable)) return;   // don't steal arrows while typing
+    e.preventDefault();
+    var step = e.key === 'ArrowLeft' ? -1 : 1;
+    if ($('#viewer').classList.contains('show')) viewerNav(step); else nav(step);
+  }
+});
+var resizeT; window.addEventListener('resize', function(){ clearTimeout(resizeT); resizeT = setTimeout(function(){ if (V.pdf) drawPages(V.token); if (state.menu) positionMenu(); }, 200); });
+
+/* Boot */
+$('#vClose').innerHTML = ICON.x; $('#vDownload').innerHTML = ICON.dl;
+$('#vPrev').innerHTML = ICON.left + '<span>Trước</span>'; $('#vNext').innerHTML = '<span>Sau</span>' + ICON.right;
+$$('[data-zoom]').forEach(function(b){ b.innerHTML = b.getAttribute('data-zoom') === '1' ? ICON.plus : ICON.minus; });
+if (IS_DEMO) { $('#demoBanner').hidden = false; load(); }
+else { state.token = store(TOKEN_KEY); if (state.token) load(); else renderLogin(); }
+</script>
+</body>
+</html>
