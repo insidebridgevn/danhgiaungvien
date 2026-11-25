@@ -159,6 +159,9 @@
   .row.prow .piv svg{width:15px;height:15px;flex:none}
   .row.prow .piv em{font-style:normal;font-weight:600;color:var(--muted)}
   .row.prow .piv.past{color:var(--muted);font-weight:600}
+  .row.prow .pphone{display:block;margin-top:2px;font-variant-numeric:tabular-nums}
+  .row.prow .pphone a{color:var(--muted);text-decoration:none}
+  .row.prow .pphone a:hover{color:inherit;text-decoration:underline}
   .row.prow .muted{color:var(--muted);font-weight:500}
   @media (max-width:760px){.row.prow{grid-template-columns:1fr;gap:4px}.list .row.th.prow{display:flex}}
   .live{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#1F7A50;padding:0 4px;cursor:default}
@@ -708,7 +711,7 @@ var DEMO_API = {
     if (d.me.scheduleOnly) {
       d.invite = null; d.statuses = []; d.hrStatuses = [];
       d.candidates = d.candidates.filter(function(c){ return c.interview && !(c.hidden && !c.expired) && !/^(Từ chối PV|Huỷ PV)$/.test(c.hrStatus || ''); })
-        .map(function(c){ return { ref: c.ref, name: c.name, position: c.position, interview: c.interview }; });
+        .map(function(c, i){ return { ref: c.ref, name: c.name, position: c.position, phone: '09000000' + (10 + i), interview: c.interview }; });
       return d;
     }
     if (!d.me.isHr) d.invite = null;
@@ -1023,6 +1026,7 @@ function renderTop(){
   $('#meEmail').textContent = me.label || me.email;
   $('#meDepts').textContent = me.depts.join(' · ') + (me.isAdmin ? ' · Quản lý' : me.isHr ? ' · HR' : '');
   $('#accBtn').hidden = !me.isAdmin;
+  var ft = $('footer'); if (ft) ft.hidden = !!me.scheduleOnly;
   $('#logoutBtn').hidden = IS_DEMO;
   liveLabel();
 }
@@ -1103,7 +1107,7 @@ function filtered(skipKey){
     else if (state.filter !== 'all' && isClosed(c)) return false;
     if (state.filter === '__none' && !isPending(c)) return false;
     if (state.filter !== 'all' && state.filter !== '__none' && state.filter !== '__closed' && revStatuses(c).indexOf(state.filter) < 0) return false;
-    if (q && (c.name + ' ' + c.position + ' ' + c.ref).toLowerCase().indexOf(q) < 0) return false;
+    if (q && (c.name + ' ' + c.position + ' ' + c.ref + ' ' + (viewOnly() ? c.phone || '' : '')).toLowerCase().indexOf(q) < 0) return false;
     if (skipKey !== 'position' && f.position && f.position.length && f.position.indexOf(c.position) < 0) return false;
     if (skipKey !== 'exp' && f.exp && f.exp.length && f.exp.indexOf(c.exp) < 0) return false;
     if (skipKey !== 'avail' && f.avail && f.avail.length && f.avail.indexOf(c.avail) < 0) return false;
@@ -1135,7 +1139,7 @@ function renderPage(){
       : '<div class="head"><div><span class="kicker">Hồ sơ ứng tuyển</span><h1>Đánh giá ứng viên</h1>' +
       '<p>Phòng ban: ' + esc(d.me.depts.join(', ')) + '</p></div><span id="pendingWrap"></span></div>') +
     '<div class="tools">' +
-      '<label class="search">' + ICON.search + '<input id="q" type="search" placeholder="' + (d.me.scheduleOnly ? 'Tìm tên, vị trí…' : 'Tìm tên, vị trí, mã hồ sơ…') + '" value="' + esc(state.q) + '"></label>' +
+      '<label class="search">' + ICON.search + '<input id="q" type="search" placeholder="' + (d.me.scheduleOnly ? 'Tìm tên, số điện thoại, vị trí…' : 'Tìm tên, vị trí, mã hồ sơ…') + '" value="' + esc(state.q) + '"></label>' +
       '<span class="live" id="liveAt"><i></i>Tự cập nhật</span><span id="clearWrap"></span>' +
       (d.me.isAdmin ? '<button class="chip chip-priv' + (privOn() ? ' on' : '') + '" data-privacy title="Chỉ hiện tên, vị trí và lịch phỏng vấn – để chụp màn hình gửi admin">' + (privOn() ? ICON.eye + 'Hiện lại thông tin' : ICON.eyeOff + 'Ẩn thông tin') + '</button>' : '') +
     '</div>' +
@@ -1176,7 +1180,7 @@ function renderList(){
         return '<button class="hcell' + (colActive(col) ? ' filtered' : '') + (state.menu === col.key ? ' open' : '') + '" data-col="' + col.key + '"><span>' + lab[col.key] + '</span>' + (colActive(col) ? '<i class="fdot"></i>' : '') + ICON.caret + '</button>';
       }).join('') + '</div>' +
       (list.length ? list.map(function(c){
-        return '<div class="row prow"><span class="cand"><b>' + esc(c.name) + '</b></span><span class="cell-pos"><b>' + esc(c.position) + '</b></span>' +
+        return '<div class="row prow"><span class="cand"><span style="min-width:0"><b>' + esc(c.name) + '</b>' + (viewOnly() && c.phone ? '<small class="pphone"><a href="tel:' + esc(String(c.phone).replace(/[^\d+]/g, '')) + '">' + esc(c.phone) + '</a></small>' : '') + '</span></span><span class="cell-pos"><b>' + esc(c.position) + '</b></span>' +
           '<span class="piv' + (ivPast(c) ? ' past' : '') + '">' + (c.interview ? ICON.cal + esc(c.interview) + ' <em>' + esc(ivDay(c).slice(-4)) + '</em>' : '<span class="muted">Chưa có lịch</span>') + '</span></div>';
       }).join('') : '<div class="empty">' + (viewOnly() && !state.data.candidates.length ? 'Chưa có ứng viên nào có lịch phỏng vấn.' : 'Không có hồ sơ nào phù hợp bộ lọc.') + '</div>');
     if (state.menu) positionMenu();
