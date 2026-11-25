@@ -151,7 +151,15 @@
   .cm-range input{flex:1;min-width:0;height:38px;border:1px solid var(--line);border-radius:10px;padding:0 10px;outline:none;font-variant-numeric:tabular-nums}
   .cm-range input:focus{border-color:var(--ink)}
   .chip-clear{color:var(--accent-dark);border-style:dashed}
-  .chip-hidden svg,.chip-clear svg{width:14px;height:14px}
+  .chip-hidden svg,.chip-clear svg,.chip-priv svg{width:14px;height:14px}
+  .chip-priv{margin-left:auto}
+  .chip-priv.on{background:var(--ink-2,#3a2a22);color:#fff;border-color:transparent}
+  .row.prow{grid-template-columns:minmax(0,1.2fr) minmax(0,1.2fr) minmax(0,1fr)}
+  .row.prow .piv{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-variant-numeric:tabular-nums}
+  .row.prow .piv svg{width:15px;height:15px;flex:none}
+  .row.prow .piv em{font-style:normal;font-weight:600;color:var(--muted)}
+  .row.prow .muted{color:var(--muted);font-weight:500}
+  @media (max-width:760px){.row.prow{grid-template-columns:1fr;gap:4px}.list .row.th.prow{display:flex}}
   .live{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#1F7A50;padding:0 4px;cursor:default}
   .live i{width:8px;height:8px;border-radius:50%;background:#22A06B;box-shadow:0 0 0 0 rgba(34,160,107,.5);animation:livep 2s infinite}
   @keyframes livep{70%{box-shadow:0 0 0 7px rgba(34,160,107,0)}100%{box-shadow:0 0 0 0 rgba(34,160,107,0)}}
@@ -1023,12 +1031,14 @@ var COLS = [
   { key: 'eval', label: 'Đánh giá leader', sorts: [],
     groups: [['status', 'Có leader đánh giá', revStatuses]] },
   { key: 'hr', label: 'HR', sorts: [['interview', 'asc', 'Lịch PV sớm nhất'], ['interview', 'desc', 'Lịch PV muộn nhất']],
-    groups: [['hr', 'Trạng thái HR', function(c){ return c.hrStatus || 'Chưa xử lý'; }], ['mail', 'Thư mời', function(c){ return c.invite ? 'Mail sent' : 'Not sent'; }]] }
+    groups: [['hr', 'Trạng thái HR', function(c){ return c.hrStatus || 'Chưa xử lý'; }], ['ivday', 'Ngày phỏng vấn', ivDay], ['mail', 'Thư mời', function(c){ return c.invite ? 'Mail sent' : 'Not sent'; }]] }
 ];
 state.sort = { by: 'date', dir: 'desc' };
 state.cf = {};          // column filters: { position: [...], exp: [...], avail: [...], status: [...], hr: [...], salMin, salMax }
 state.menu = null;      // open header menu key
 state.showHidden = false;
+state.privacy = (function(){ try { return localStorage.getItem('dg_privacy') === '1'; } catch (e) { return false; } })();
+function privOn(){ return !!(state.privacy && state.data && state.data.me && state.data.me.isAdmin); }
 
 function expRank(s){
   s = String(s || '').toLowerCase();
@@ -1052,11 +1062,18 @@ function sortVal(c, by){
   if (by === 'interview') { var m = /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/.exec(c.interview || ''); return m ? +(m[3] + m[2] + m[1] + m[4] + m[5]) : null; }
   return '';
 }
+/** Ngày phỏng vấn dạng "26/11/2026 (T5)" – dùng cho bộ lọc cột HR */
+var WD_VN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+function ivDay(c){
+  var m = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(c.interview || '');
+  if (!m) return 'Chưa có lịch';
+  return m[0] + ' (' + WD_VN[new Date(+m[3], +m[2] - 1, +m[1]).getDay()] + ')';
+}
 function colActive(col){
   var f = state.cf;
   if (col.key === 'salary') return f.salMin != null || f.salMax != null;
   if (col.key === 'eval') return !!(f.status && f.status.length);
-  if (col.key === 'hr') return !!((f.hr && f.hr.length) || (f.mail && f.mail.length));
+  if (col.key === 'hr') return !!((f.hr && f.hr.length) || (f.mail && f.mail.length) || (f.ivday && f.ivday.length));
   return !!(f[col.key] && f[col.key].length);
 }
 function anyColFilter(){ return COLS.some(colActive); }
@@ -1079,6 +1096,7 @@ function filtered(skipKey){
     if (skipKey !== 'avail' && f.avail && f.avail.length && f.avail.indexOf(c.avail) < 0) return false;
     if (skipKey !== 'eval' && f.status && f.status.length && !revStatuses(c).some(function(v){ return f.status.indexOf(v) >= 0; })) return false;
     if (skipKey !== 'hr' && f.hr && f.hr.length && f.hr.indexOf(c.hrStatus || 'Chưa xử lý') < 0) return false;
+    if (skipKey !== 'hr' && f.ivday && f.ivday.length && f.ivday.indexOf(ivDay(c)) < 0) return false;
     if (skipKey !== 'hr' && f.mail && f.mail.length && f.mail.indexOf(c.invite ? 'Mail sent' : 'Not sent') < 0) return false;
     if (skipKey !== 'salary' && (f.salMin != null || f.salMax != null)) {
       var n = salaryNum(c.salary);
@@ -1104,6 +1122,7 @@ function renderPage(){
     '<div class="tools">' +
       '<label class="search">' + ICON.search + '<input id="q" type="search" placeholder="Tìm tên, vị trí, mã hồ sơ…" value="' + esc(state.q) + '"></label>' +
       '<span class="live" id="liveAt"><i></i>Tự cập nhật</span><span id="clearWrap"></span>' +
+      (d.me.isAdmin ? '<button class="chip chip-priv' + (privOn() ? ' on' : '') + '" data-privacy title="Chỉ hiện tên, vị trí và lịch phỏng vấn – để chụp màn hình gửi admin">' + (privOn() ? ICON.eye + 'Hiện lại thông tin' : ICON.eyeOff + 'Ẩn thông tin') + '</button>' : '') +
     '</div>' +
     '<div class="chips" id="chips"></div>' +
     '<div class="list" id="list"></div>';
@@ -1112,6 +1131,8 @@ function renderPage(){
 }
 
 function refreshParts(){
+  document.body.classList.toggle('privacy', privOn());
+  if (privOn()) { $('#pendingWrap').innerHTML = ''; $('#chips').innerHTML = ''; $('#clearWrap').innerHTML = anyColFilter() ? '<button class="chip chip-clear" data-clearcf>' + ICON.x + 'Xoá bộ lọc cột</button>' : ''; renderList(); return; }
   var d = state.data, base = d.candidates.filter(function(c){ return !c.hidden; });
   var pending = base.filter(isPending).length;
   var hiddenN = d.candidates.length - base.length;
@@ -1133,6 +1154,19 @@ function refreshParts(){
 
 function renderList(){
   var list = filtered();
+  if (privOn()) {   // chế độ ẩn thông tin: chỉ tên, vị trí, lịch phỏng vấn
+    var PC = COLS.filter(function(col){ return col.key === 'name' || col.key === 'position' || col.key === 'hr'; });
+    var lab = { name: 'Ứng viên', position: 'Vị trí ứng tuyển', hr: 'Thời gian phỏng vấn' };
+    $('#list').innerHTML = '<div class="row th prow">' + PC.map(function(col){
+        return '<button class="hcell' + (colActive(col) ? ' filtered' : '') + (state.menu === col.key ? ' open' : '') + '" data-col="' + col.key + '"><span>' + lab[col.key] + '</span>' + (colActive(col) ? '<i class="fdot"></i>' : '') + ICON.caret + '</button>';
+      }).join('') + '</div>' +
+      (list.length ? list.map(function(c){
+        return '<div class="row prow"><span class="cand"><b>' + esc(c.name) + '</b></span><span class="cell-pos"><b>' + esc(c.position) + '</b></span>' +
+          '<span class="piv">' + (c.interview ? ICON.cal + esc(c.interview) + ' <em>' + esc(ivDay(c).slice(-4)) + '</em>' : '<span class="muted">Chưa có lịch</span>') + '</span></div>';
+      }).join('') : '<div class="empty">Không có hồ sơ nào phù hợp bộ lọc.</div>');
+    if (state.menu) positionMenu();
+    return;
+  }
   var head = '<div class="row th">' + COLS.map(function(col){
     var sorted = col.sorts.some(function(s){ return s[0] === state.sort.by; }) && !(col.key === 'name' && state.sort.by === 'date' && state.sort.dir === 'desc');
     var arrow = sorted ? (state.sort.dir === 'asc' ? ICON.arrowUp : ICON.arrowDown) : '';
@@ -1185,6 +1219,7 @@ function renderMenu(){
     (state.cf[fkey] || []).forEach(function(v){ if (!(v in counts)) { counts[v] = 0; order.push(v); } });
     if (fkey === 'exp') order.sort(function(a, b){ return expRank(a) - expRank(b); });
     else if (fkey === 'avail') order.sort(function(a, b){ return availNum(a) - availNum(b); });
+    else if (fkey === 'ivday') order.sort(function(a, b){ return availNum(a) - availNum(b); });   // "Chưa có lịch" xếp cuối
     else if (fkey === 'status' || fkey === 'hr') {
       var pref = fkey === 'status' ? ['Chưa đánh giá'].concat(state.data.statuses) : ['Chưa xử lý'].concat(state.data.hrStatuses);
       order.sort(function(a, b){ var x = pref.indexOf(a), y = pref.indexOf(b); return (x < 0 ? 99 : x) - (y < 0 ? 99 : y); });
@@ -1831,6 +1866,7 @@ document.addEventListener('click', function(e){
   if ((el = e.target.closest('[data-sort]'))) { var sp = el.getAttribute('data-sort').split(':'); state.sort = { by: sp[0], dir: sp[1] }; renderList(); renderMenu(); return; }
   if ((el = e.target.closest('[data-cfclear]'))) { var k = el.getAttribute('data-cfclear'); if (k === 'salary') { delete state.cf.salMin; delete state.cf.salMax; } else delete state.cf[k]; refreshParts(); renderMenu(); return; }
   if (e.target.closest('[data-clearcf]')) { state.cf = {}; closeMenu(); refreshParts(); return; }
+  if (e.target.closest('[data-privacy]')) { state.privacy = !privOn(); if (state.privacy) { state.sortPrev = state.sort; state.sort = { by: 'interview', dir: 'asc' }; } else if (state.sortPrev) state.sort = state.sortPrev; try { localStorage.setItem('dg_privacy', state.privacy ? '1' : '0'); } catch (x) {} closeMenu(); renderPage(); return; }
   if (e.target.closest('[data-showhidden]')) { state.showHidden = !state.showHidden; state.filter = 'all'; refreshParts(); return; }
   if (e.target.closest('[data-hide]')) { setHiddenUI(state.current, true); return; }
   if (e.target.closest('[data-unhide]')) { setHiddenUI(state.current, false); return; }
